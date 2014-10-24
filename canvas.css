@@ -1,0 +1,9 @@
+#colorwheel{
+	position: absolute;
+	top: 0px;
+}
+#color{
+	position: absolute;
+	top: -10px;
+	left: 98.5%;
+}

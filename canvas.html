@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Ninia</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script src="canvas.js"></script>
+    <script src="leap.js"></script>
+    <link rel="stylesheet" type="text/css" href="canvas.css">
+  </head>
+  <body background="img/bg_black.jpg"  onload = "initialization()">
+    <p id="color"><font color="white">0</font></p>
+    <canvas id="colorwheel" width="600" height="600" onmousemove="expandColorWheel()" onmouseout="hideColorWheel()">
+      Your browser does not support the canvas.
+    </canvas>
+
+  </body>
+</html>
