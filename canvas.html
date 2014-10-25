@@ -2,16 +2,32 @@
 <html>
   <head>
     <title>Ninia</title>
+    <!--
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    -->
     <script src="canvas.js"></script>
     <script src="leap.js"></script>
     <link rel="stylesheet" type="text/css" href="canvas.css">
   </head>
   <body background="img/bg_black.jpg"  onload = "initialization()">
-    <p id="color"><font color="white">0</font></p>
-    <canvas id="colorwheel" width="600" height="600" onmousemove="expandColorWheel()" onmouseout="hideColorWheel()">
+    <p id="msg">cursor position</p>
+    <p id="seletedcolor" onmousemove="expandColorWheel(event)"> <font color="white">0</font></p>
+    <p id="seletedpensize" onmousemove="expandPenWheel(event)"> <font color="white">0</font></p>
+
+    <canvas id="colorwheel" width="600" height="600" onmousemove="expandColorWheel(event)" onmouseout="hideColorWheel()" >
+      color wheel.
+    </canvas>
+
+    <canvas id="penwheel" width="600" height="600" onmousemove="expandPenWheel(event)" onmouseout="hidePenWheel()" >
+      pen wheel.
+    </canvas>
+
+    <canvas id="maincanvas" onclick="switchdraw()" onmousemove="draw(event)" ondblclick="eraser()"> 
       Your browser does not support the canvas.
     </canvas>
 
+    <canvas id="cursor" onclick="switchdraw()" onmousemove="draw(event)" ondblclick="eraser()"> 
+      This is cursor.
+    </canvas>
   </body>
 </html>

@@ -1,9 +1,51 @@
 #colorwheel{
 	position: absolute;
+  	margin: 0px;
 	top: 0px;
+	z-index: 0;
 }
-#color{
+
+#penwheel{
+	position: absolute;
+  	margin: 0px;
+	z-index: 0;
+}
+
+#maincanvas{
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	height: 100%;
+	width: 100%;
+  	margin: 0px;
+	z-index: 9;
+}
+
+#seletedcolor{
 	position: absolute;
 	top: -10px;
 	left: 98.5%;
+	z-index: 10;
+}
+
+#seletedpensize{
+	position: absolute;
+	left: 98.5%;
+	z-index: 10;
+}
+
+#cursor{
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	height: 100%;
+	width: 100%;
+  	margin: 0px;
+	z-index: 1;
+}
+
+html, body{
+  width:  100%;
+  height: 100%;
+  margin: 0px;
 }
