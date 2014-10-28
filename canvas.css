@@ -36,18 +36,11 @@
 }
 
 #cursor{
-	position: absolute;
-	top: 0px;
-	left: 0px;
-	height: 100%;
-	width: 100%;
-  	margin: 0px;
-	z-index: 1;
-}
-
-html, body{
-  overflow: hidden;
-  width:  100%;
-  height: 100%;
-  margin: 0px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+    margin: 0px;
+    z-index: 9;
 }

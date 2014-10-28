@@ -11,7 +11,7 @@ var pensize = [1, 2, 4, 8, 12, 16, 20, 18, 14, 10, 6];
 var drawing = 0; //['off', 'draw', 'erase']
 var draw_off = 0, draw_on = 1, draw_erase=2;
 
-function initialization(){  
+function initialization(){ 
   w = window.innerWidth;
   h = window.innerHeight;
   document.getElementById("maincanvas").width =  w;
@@ -89,12 +89,11 @@ function draw(event){
     }
   }
 
-  //cursor
+  //cursor    
   curs_ctx.beginPath();
   curs_ctx.clearRect(0,0,w,h);
   curs_ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
-  curs_ctx.shadowBlur = 20;
-  curs_ctx.moveTo(cX, cY);
+
   if(drawing == draw_erase){
     curs_ctx.rect(cX-esize/2, cY-esize/2, esize, esize);
   } else if(drawing == draw_on) {
@@ -106,14 +105,14 @@ function draw(event){
       arrow.src = "./img/darrow.png";
       curs_ctx.drawImage(arrow,w-80, cY-100, 30, 200);
     } else {
-      curs_ctx.arc(cX, cY, 20, 0, 2*Math.PI);
-      curs_ctx.shadowColor = '#FFFFFF';
+      cursor(event);
     }
   }
   
+  curs_ctx.shadowBlur = 20;
+  curs_ctx.moveTo(cX, cY);
   curs_ctx.fill();
   curs_ctx.closePath();
-
 }
 
 function expandColorWheel(event){

@@ -8,10 +8,16 @@
     <script src="controlpad.js"></script> 
     <link rel="stylesheet" type="text/css" href="controlpad.css">
   </head>
-  <body background="img/bg_black.jpg">
+  <body background="img/bg_black.jpg" onload = "controlpad_initialization()" onresize="controlpad_initialization()">
+    
+    <!-- cursor -->
+    <canvas id="cursor" onmousemove="cursor(event)" onclick="showControlPad()"> 
+      This is cursor.
+    </canvas>
+
     <!--following is control pad-->
     <div id="greyscreen" ></div>
-    <div id="controlpad" onmousemove="padControl(event)" onclick="hideControlPad()">
+    <div id="controlpad" onmousemove="padControl(event)" >
       <div id='up'>
         <image id="umsk"src="img/up_mask.png" class="upicon"></image>
         <image src="img/up_icon.png" class="upicon"></image>
@@ -31,7 +37,7 @@
         <image id = "dmsk" src="img/down_mask.png" class="downicon"></image>
         <image src="img/down_icon.png" class="downicon"></image>
         <image src="img/canvas_icon.png" class="downicon"></image>
-      </div>
+      </div> 
     </div>
     <p id="demo"><font color="red">This is some text!</font></p>
     <button onclick="showControlPad()">Open control pad</button>
