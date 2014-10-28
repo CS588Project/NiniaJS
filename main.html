@@ -1,26 +1,37 @@
+<!DOCTYPE html>
 <html>
   <head>
     <title>Ninia</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
-    <script src="js/jquery.easing.1.3.js"></script>
-    <script src="main.js"></script>
+    <script src="jquery.coverstand.min.js"></script>
     <script src="leap.js"></script>
-    <link rel="stylesheet" type="text/css" href="main.css">
+    <script src="controlpad.js"></script> 
+    <link rel="stylesheet" type="text/css" href="controlpad.css">
   </head>
   <body background="img/bg_black.jpg">
+    <!--following is control pad-->
+    <div id="greyscreen" ></div>
     <div id="controlpad" onmousemove="padControl(event)" onclick="hideControlPad()">
-      <img src="img/up_icon.png" class="upicon">
-      <img id="umsk"src="img/up_mask.png" class="upicon">
-      <img src="img/gallery_icon.png" class="upicon"><br>
-      <img src="img/left_icon.png" class="lefticon">
-      <img id="lmsk" src="img/left_mask.png" class="lefticon">
-      <img src="img/slide_icon.png" class="lefticon">
-      <img src="img/right_icon.png" class="righticon">
-      <img id="rmsk" src="img/right_mask.png" class="righticon">
-      <img src="img/video_icon.png" class="righticon"><br>
-      <img src="img/down_icon.png" class="downicon">
-      <img id = "dmsk" src="img/down_mask.png" class="downicon">
-      <img src="img/canvas_icon.png" class="downicon"><br>
+      <div id='up'>
+        <image id="umsk"src="img/up_mask.png" class="upicon"></image>
+        <image src="img/up_icon.png" class="upicon"></image>
+        <image src="img/gallery_icon.png" class="upicon"></image>
+      </div><br>
+      <div id='left'>
+        <image id="lmsk" src="img/left_mask.png" class="lefticon"></image>
+        <image src="img/left_icon.png" class="lefticon"></image>
+        <image src="img/slide_icon.png" class="lefticon"></image>
+      </div>
+      <div id='right'>
+        <image id="rmsk" src="img/right_mask.png" class="righticon"></image>
+        <image src="img/right_icon.png" class="righticon"></image>
+        <image src="img/video_icon.png" class="righticon"></image>
+      </div><br>
+      <div id='down'>
+        <image id = "dmsk" src="img/down_mask.png" class="downicon"></image>
+        <image src="img/down_icon.png" class="downicon"></image>
+        <image src="img/canvas_icon.png" class="downicon"></image>
+      </div>
     </div>
     <p id="demo"><font color="red">This is some text!</font></p>
     <button onclick="showControlPad()">Open control pad</button>

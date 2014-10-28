@@ -12,6 +12,8 @@ var drawing = 0; //['off', 'draw', 'erase']
 var draw_off = 0, draw_on = 1, draw_erase=2;
 
 function initialization(){  
+  w = window.innerWidth;
+  h = window.innerHeight;
   document.getElementById("maincanvas").width =  w;
   document.getElementById("maincanvas").height =  h;
   document.getElementById("cursor").width =  w;
@@ -58,6 +60,7 @@ function draw(event){
   var main_ctx = mc.getContext("2d");
   var esize = pensize[pen_begin%10]*8+40;
   
+  //paint control
   if (drawing == draw_on) {
     document.getElementById("msg").innerHTML = "<font color='red'> cursor position: " + cX +","+ cY +" </font>";
     main_ctx.lineTo(cX, cY);
@@ -69,34 +72,43 @@ function draw(event){
     main_ctx.clearRect(cX-esize/2, cY-esize/2, esize, esize);
   } else {
     main_ctx.moveTo(cX, cY);
-
-    if(color_wheel_expand){
+    if(color_wheel_expand && !pen_wheel_expand){
       color_begin = Math.ceil(cY/30);
       colorWheel(250, 120);
       document.getElementById("seletedcolor").innerHTML = "<font color="+color[color_begin%10]+">" + (color_begin%10)+"</font>";
-    }  
+    } else {
+      if(!pen_wheel_expand) expandColorWheel(event);
+    }
 
     if(pen_wheel_expand){
       pen_begin = Math.ceil(cY/30);
       penWheel(250);
       document.getElementById("seletedpensize").innerHTML = "<font color='white'>" + pensize[pen_begin%10]+"</font>";
-    }  
+    } else {
+      if(!color_wheel_expand) expandPenWheel(event);
+    }
   }
 
-  //draw cursor
+  //cursor
   curs_ctx.beginPath();
   curs_ctx.clearRect(0,0,w,h);
   curs_ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
+  curs_ctx.shadowBlur = 20;
   curs_ctx.moveTo(cX, cY);
   if(drawing == draw_erase){
     curs_ctx.rect(cX-esize/2, cY-esize/2, esize, esize);
   } else if(drawing == draw_on) {
-    curs_ctx.arc(cX, cY, 20, 0, 2*Math.PI);
-    curs_ctx.fillStyle = 'rgba(0, 250, 0, 0.2)';
+    curs_ctx.arc(cX, cY, 3+pensize[pen_begin%10], 0, 2*Math.PI);
+    curs_ctx.fillStyle = color[color_begin%10];
   } else {
-    curs_ctx.arc(cX, cY, 20, 0, 2*Math.PI);
-    curs_ctx.shadowColor = '#FFFFFF';
-    curs_ctx.shadowBlur = 100;
+    if(pen_wheel_expand || color_wheel_expand){
+      var arrow = new Image();
+      arrow.src = "./img/darrow.png";
+      curs_ctx.drawImage(arrow,w-80, cY-100, 30, 200);
+    } else {
+      curs_ctx.arc(cX, cY, 20, 0, 2*Math.PI);
+      curs_ctx.shadowColor = '#FFFFFF';
+    }
   }
   
   curs_ctx.fill();
@@ -108,7 +120,7 @@ function expandColorWheel(event){
   var cX = event.screenX;  
   var cY = event.screenY;
 
-  if(cX > (w-200) && cY < 200){
+  if(cX > (w-100) && cY < 200){
     color_wheel_expand = true;
     colorWheel(250, 120);
   }
@@ -144,7 +156,7 @@ function expandPenWheel(event){
   var cX = event.screenX;  
   var cY = event.screenY;
 
-  if(cX > (w-200) && cY > (h-200)){
+  if(cX > (w-100) && cY > (h+25)){
     pen_wheel_expand = true;
     penWheel(250);
   }
@@ -159,7 +171,6 @@ function penWheel(r){
   var ctx = document.getElementById("penwheel").getContext("2d");
 
   ctx.clearRect(0,0,600,600);
-
   ctx.shadowColor = '#999';
   ctx.shadowBlur = 50;
 

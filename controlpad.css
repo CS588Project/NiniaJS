@@ -12,46 +12,36 @@
 #controlpad .upicon{
     position:absolute; 
     height: 40%;
-    margin-top: 0%;
-    margin-left: 25%;
+    top: -10%;
+    left: 30%;
+    margin: 0;
 }
 #controlpad .lefticon{
     position:absolute; 
     height: 40%;
-    margin-top: 30%;
-    margin-left: -10%;
+    top: 25%;
+    left: -5%;
+    margin: 0;
 }
 #controlpad .righticon{
     position:absolute; 
     height: 40%;
-    margin-top:30%;
-    margin-left: 60%;
+    top:25%;
+    left: 65%;
+    margin: 0;
 }
 #controlpad .downicon{
     position:absolute; 
     height: 40%;
-    margin-top:60%;
-    margin-left:25%;
+    top:60%;
+    left:30%;
 }
 
-#umsk{
-    z-index: -1;
-    opacity:0.8;
-    /*top, right, buttom, left
-    clip: rect(50px, 200px, 200px, 0px);*/
-}
-
-#rmsk{
-    z-index: -1;
-    opacity:0.8;
-}
-
-#lmsk{
-    z-index: -1;
-    opacity:0.8;
-}
-
-#dmsk{
-    z-index: -1;
-    opacity:0.8;
+#greyscreen{
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: #FFF;
+    opacity: 0.15;
+    display: none;
 }
