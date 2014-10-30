@@ -38,6 +38,22 @@ function hideControlPad(){
   $("#greyscreen").css({ "display": "none", "width":$(document).width(),"height":$(document).height()}); 
 }
 
+function goVedio(){
+  location.href='./video.html'
+}
+
+function goCanvas(){
+  location.href='./canvas.html'
+}
+
+function goGallery(){
+  location.href='./gallery.html'
+}
+
+function goPDF(){
+  location.href='./pdf.html'
+}
+
 function padControl(event){
   var divCX =  window.innerWidth/2;
   var divCY =  window.innerHeight/2;
@@ -66,8 +82,7 @@ function padControl(event){
         if(offsetx < -200){
           lmsk.style.opacity = "0.0";
           $(".lefticon").animate({
-            top:'-=25%', left:'-=25%', height:'+=50%', opacity:'0.0'},900, 
-            function(){ location.href='./canvas.html'})
+            top:'-=25%', left:'-=25%', height:'+=50%', opacity:'0.0'}, 900, function() {goPDF()})
         }
       }else{
         rmsk.style.clip = "rect(0px, "+offsetx+"px, 200px, 0px)";
@@ -75,8 +90,7 @@ function padControl(event){
         if(offsetx > 200){
           rmsk.style.opacity = "0.0";
           $(".righticon").animate({
-            top:'-=25%', left:'-=25%', height:'+=50%', opacity:'0.0'},900, 
-            function(){ location.href='./canvas.html'})
+            top:'-=25%', left:'-=25%', height:'+=50%', opacity:'0.0'},900, function() {goVedio()})
         }
       }
     } 
@@ -87,8 +101,7 @@ function padControl(event){
         if(offsety < -200){
           umsk.style.opacity = "0.0";
           $(".upicon").animate({
-            top:'-=25%', left:'-=25%', height:'+=50%', opacity:'0.0'},900, 
-            function(){ location.href='./canvas.html'})
+            top:'-=25%', left:'-=25%', height:'+=50%', opacity:'0.0'},900, function() {goGallery()})
         }
       }else{
         dmsk.style.clip = "rect(0px, 200px, "+offsety+ "px, 0px)";
@@ -96,8 +109,7 @@ function padControl(event){
         if(offsety > 200){
           dmsk.style.opacity = "0.0";
           $(".downicon").animate({
-            top:'-=25%', left:'-=25%', height:'+=50%', opacity:'0.0'},900, 
-            function(){ location.href='./canvas.html'})
+            top:'-=25%', left:'-=25%', height:'+=50%', opacity:'0.0'},900, function() {goCanvas()})
         }
       }
     }

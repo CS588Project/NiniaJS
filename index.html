@@ -3,10 +3,9 @@
   <head>
     <title>Ninia</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
-    <script src="jquery.coverstand.min.js"></script>
     <script src="leap.js"></script>
-    <script src="controlpad.js"></script> 
-    <link rel="stylesheet" type="text/css" href="controlpad.css">
+    <script src="js/controlpad.js"></script> 
+    <link rel="stylesheet" type="text/css" href="css/controlpad.css">
   </head>
   <body background="img/bg_black.jpg" onload = "controlpad_initialization()" onresize="controlpad_initialization()">
     
@@ -14,9 +13,9 @@
     <canvas id="cursor" onmousemove="cursor(event)" onclick="showControlPad()"> 
       This is cursor.
     </canvas>
+    <div id="greyscreen" ></div>
 
     <!--following is control pad-->
-    <div id="greyscreen" ></div>
     <div id="controlpad" onmousemove="padControl(event)" >
       <div id='up'>
         <image id="umsk"src="img/up_mask.png" class="upicon"></image>
@@ -40,6 +39,5 @@
       </div> 
     </div>
     <p id="demo"><font color="red">This is some text!</font></p>
-    <button onclick="showControlPad()">Open control pad</button>
   </body>
 </html>
