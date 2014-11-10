@@ -16,34 +16,41 @@
   <script src="colorbox_gallery/jquery.colorbox.js"></script>
   <script language="JavaScript" type="text/javascript" src="js/gallery.js"></script>
 </head>
-<body background="img/bg_black.jpg" onload = "controlpad_initialization()" onresize="controlpad_initialization()">
+<body background="img/bg_black.jpg" style="overflow: hidden">
+
+<p id="demo" class="blur" ><font color="red"></font></p>
+<p id="demo2" class="blur" ><font color="red"></font></p>
+<p id="demo3" class="blur" ><font color="red"></font></p>
+<p id="demo4" class="blur" ><font color="red"></font></p>
 <!--Content Flow-->
 <br><br><br><br><br><br>
-<div id="theflow" class="ContentFlow">
-    <div class="flow"  >
-      <div class="item" id="div_img0"> 
-        <img class="content" id="img0" src='galleryImg/image0.jpg'></img>
+<div class="blur">
+  <div id="theflow" class="ContentFlow">
+      <div class="flow"  >
+        <div class="item" id="div_img0"> 
+          <img class="content" id="img0" src='galleryImg/image0.jpg'></img>
+        </div>
+        <div class="item" id="div_img1">
+          <img class="content" id="img1" src='galleryImg/image1.jpg'> </img>
+        </div> 
+        <div class="item" id="div_img2">
+          <img class="content" id="img2" src='galleryImg/image2.jpg'> </img>
+        </div> 
+        <div class="item" id="div_img3">
+          <img class="content" id="img3" src='galleryImg/image3.jpg'> </img>
+        </div> 
+        <div class="item" id="div_img4">
+          <img class="content" id="img4" src='galleryImg/image4.jpg'> </img>
+        </div> 
+        <div class="item" id="div_img5">
+          <img class="content" id="img5" src='galleryImg/image5.jpg'> </img>
+        </div> 
+        <div class="item" id="div_img6">
+          <img class="content" id="img6" src='galleryImg/image6.jpg'> </img>
+        </div>
       </div>
-      <div class="item" id="div_img1">
-        <img class="content" id="img1" src='galleryImg/image1.jpg'> </img>
-      </div> 
-      <div class="item" id="div_img2">
-        <img class="content" id="img2" src='galleryImg/image2.jpg'> </img>
-      </div> 
-      <div class="item" id="div_img3">
-        <img class="content" id="img3" src='galleryImg/image3.jpg'> </img>
-      </div> 
-      <div class="item" id="div_img4">
-        <img class="content" id="img4" src='galleryImg/image4.jpg'> </img>
-      </div> 
-      <div class="item" id="div_img5">
-        <img class="content" id="img5" src='galleryImg/image5.jpg'> </img>
-      </div> 
-      <div class="item" id="div_img6">
-        <img class="content" id="img6" src='galleryImg/image6.jpg'> </img>
-      </div>
-    </div>
-</div> 
+  </div> 
+</div>
 
 <!-- control pad -->
 <div id="output" class="blur" ></div>
@@ -83,9 +90,5 @@
     </ul>
   </div>
 </div>
-<p id="demo" class="blur" ><font color="red">This is some text!</font></p>
-<p id="demo2" class="blur" ><font color="red">This is some text!</font></p>
-<p id="demo3" class="blur" ><font color="red">This is some text!</font></p>
-<p id="demo4" class="blur" ><font color="red">This is some text!</font></p>
 </body>
 </html>

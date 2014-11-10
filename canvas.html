@@ -16,7 +16,14 @@
     <script src="js/controlpad.js"></script> 
     <link rel="stylesheet" type="text/css" href="css/controlpad.css">
   </head>
-  <body background="img/bg_black.jpg"  onload = "initialization()" onresize="initialization()"> 
+  <body background="img/bg_black.jpg"  onload = "initialization()" onresize="initialization()" style="overflow: hidden"> 
+
+  <p id="demo" class="blur" ><font color="red"></font></p>
+  <p id="demo2" class="blur" ><font color="red"></font></p>
+  <p id="demo3" class="blur" ><font color="red"></font></p>
+  <p id="demo4" class="blur" ><font color="red"></font></p>
+  <!-- Canvas -->
+  <div class="blur">
     <p id="msg">cursor position</p>
     <p id="seletedcolor" > <font color="white">0</font></p>
     <p id="seletedpensize" > <font color="white">1</font></p>
@@ -37,8 +44,8 @@
     <canvas id="cursor" onclick="switchdraw()" onmousemove="draw(event)" ondblclick="eraser()"> 
       This is cursor.
     </canvas>
+  </div>
 
-    <!--following is control pad-->
     <!-- control pad -->
     <div id="output" class="blur" ></div>
     <div id="progress" class="blur" ></div>
@@ -77,9 +84,5 @@
         </ul>
       </div>
     </div>
-    <p id="demo" class="blur" ><font color="red">This is some text!</font></p>
-    <p id="demo2" class="blur" ><font color="red">This is some text!</font></p>
-    <p id="demo3" class="blur" ><font color="red">This is some text!</font></p>
-    <p id="demo4" class="blur" ><font color="red">This is some text!</font></p>
   </body>
 </html>

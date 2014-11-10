@@ -19,26 +19,32 @@
   <script src="js/jquery.colorbox.js"></script>
 
 </head>
-<body background="img/bg_black.jpg" onload = "controlpad_initialization()" onresize="controlpad_initialization()">
- 
+<body background="img/bg_black.jpg" style="overflow: hidden">
+
+<p id="demo" class="blur" ><font color="red"></font></p>
+<p id="demo2" class="blur" ><font color="red"></font></p>
+<p id="demo3" class="blur" ><font color="red"></font></p>
+<p id="demo4" class="blur" ><font color="red"></font></p> 
 <!--Content Flow-->
-<p id="demo"><font color="red">This is some text!</font></p>
-<button type="button" onclick="moveToPre()">Previous</button>
-<button type="button" onclick="getFile()">FileName</button>
-<button type="button" onclick="moveToNxt()">Next</button>
-<br><br>
-<div id="cf" class="ContentFlow">
-    <div id="theflow" class="flow"  >
-      <div class='item'><canvas id='pdf_thumbnail0' class='content'/></div>
-      <div class='item'><canvas id='pdf_thumbnail1' class='content'/></div>
-      <div class='item'><canvas id='pdf_thumbnail2' class='content'/></div>
-      <div class='item'><canvas id='pdf_thumbnail3' class='content'/></div>
-      <div class='item'><canvas id=pdf_thumbnail4 class='content'/></div>
-      <div class='item'><canvas id=pdf_thumbnail5 class='content'/></div>
-      <div class='item'><canvas id=pdf_thumbnail6 class='content'/></div>
-      <div class='item'><canvas id=pdf_thumbnail7 class='content'/></div>
-      <div class='item'><canvas id=pdf_thumbnail8 class='content'/></div>
-    </div>
+<div class="blur">
+  <p id="demo"><font color="red">This is some text!</font></p>
+  <button type="button" onclick="moveToPre()">Previous</button>
+  <button type="button" onclick="getFile()">FileName</button>
+  <button type="button" onclick="moveToNxt()">Next</button>
+  <br><br>
+  <div id="cf" class="ContentFlow">
+      <div id="theflow" class="flow"  >
+        <div class='item'><canvas id='pdf_thumbnail0' class='content'/></div>
+        <div class='item'><canvas id='pdf_thumbnail1' class='content'/></div>
+        <div class='item'><canvas id='pdf_thumbnail2' class='content'/></div>
+        <div class='item'><canvas id='pdf_thumbnail3' class='content'/></div>
+        <div class='item'><canvas id=pdf_thumbnail4 class='content'/></div>
+        <div class='item'><canvas id=pdf_thumbnail5 class='content'/></div>
+        <div class='item'><canvas id=pdf_thumbnail6 class='content'/></div>
+        <div class='item'><canvas id=pdf_thumbnail7 class='content'/></div>
+        <div class='item'><canvas id=pdf_thumbnail8 class='content'/></div>
+      </div>
+  </div>
 </div>
  
 <!-- control pad -->
@@ -79,9 +85,5 @@
     </ul>
   </div>
 </div>
-<p id="demo" class="blur" ><font color="red">This is some text!</font></p>
-<p id="demo2" class="blur" ><font color="red">This is some text!</font></p>
-<p id="demo3" class="blur" ><font color="red">This is some text!</font></p>
-<p id="demo4" class="blur" ><font color="red">This is some text!</font></p>   
 </body>
 </html>
