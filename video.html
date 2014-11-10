@@ -56,7 +56,7 @@
             if(e.which == 90){
                 if(popingup == false){
                     var url = "youtube.html?id=" + videoIds[myNewFlow.getActiveItem()["index"]];
-                    $.colorbox({iframe:true, id:"popup", href:url, innerWidth:648, innerHeight:396, onComplete:function(){document.getElementById("cboxLoadedContent").getElementsByTagName("iframe")[0].focus();}});
+                    $.colorbox({iframe:true, id:"popup", href:url, innerWidth: w * 0.8, innerHeight: h * 0.75, onComplete:function(){document.getElementById("cboxLoadedContent").getElementsByTagName("iframe")[0].focus();}});
                     popingup = true;
                 }else{
                     $.colorbox.close();

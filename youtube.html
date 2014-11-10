@@ -21,8 +21,8 @@
       function onYouTubeIframeAPIReady() {
         var id = getParameterByName("id");
         player = new YT.Player('player', {
-          height: '390',
-          width: '640',
+          height: window.innerHeight - 12,
+          width: window.innerWidth - 12,
           videoId: id,
           events: {
             'onReady': onPlayerReady
@@ -104,6 +104,15 @@
               jumpByTime(5);
             }else if(e.which == 83){
               jumpByTime(-5);
+            }else if(e.which == 70){
+              var el = document.getElementById('#my-player-element-container');
+              if (el.requestFullScreen) {
+                el.requestFullScreen();
+              } else if (el.mozRequestFullScreen) {
+                el.mozRequestFullScreen();
+              } else if (el.webkitRequestFullScreen) {
+                el.webkitRequestFullScreen();
+              }
             }
         });
       });
