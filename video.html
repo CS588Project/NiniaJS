@@ -2,8 +2,11 @@
 <html>
 <head>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
-  <script language="JavaScript" type="text/javascript" src="ContentFlow/contentflowsetting.js"></script>
   <script language="JavaScript" type="text/javascript" src="ContentFlow/contentflow.js"></script>
+
+  <!--for poping up video-->
+  <link rel="stylesheet" href="css/colorbox.css" />
+  <script src="js/jquery.colorbox.js"></script>
 
 </head>
 <body background="img/bg_black.jpg" onload = "controlpad_initialization()" onresize="controlpad_initialization()">
@@ -11,36 +14,57 @@
 <!--Content Flow-->
 <br><br><br><br><br><br>
 <div id="theflow" class="ContentFlow">
-    <div  class="flow"  >
+    <div class="flow" id="anchorToAddImage">
         <div class="item">
-            <img class="content" src="http://img.youtube.com/vi/XGSy3_Czz8k/0.jpg"> </img>
+            <img class="content"> </img>
         </div>
         <div class="item">
-            <img class="content" src="http://img.youtube.com/vi/XGSy3_Czz8k/0.jpg"> </img>
+            <img class="content"> </img>
         </div>
         <div class="item">
-            <img class="content" src="http://img.youtube.com/vi/XGSy3_Czz8k/0.jpg"> </img>
+            <img class="content"> </img>
         </div>
         <div class="item">
-            <img class="content" src="http://img.youtube.com/vi/XGSy3_Czz8k/0.jpg"> </img>
-        </div>
-        <div class="item">
-            <img class="content" src="http://img.youtube.com/vi/XGSy3_Czz8k/0.jpg"> </img>
-        </div>
-        <div class="item">
-            <img class="content" src="http://img.youtube.com/vi/XGSy3_Czz8k/0.jpg"> </img>
-        </div>
-        <div class="item">
-            <img class="content" src="http://img.youtube.com/vi/XGSy3_Czz8k/0.jpg"> </img>
-        </div>
-        <div class="item">
-            <img class="content" src="http://img.youtube.com/vi/XGSy3_Czz8k/0.jpg"> </img>
+            <img class="content"> </img>
         </div>
     </div>
 
     <div class="loadIndicator"></div>
+    <div id="popup"></div>
 </div>
-    
 
+<script type="text/javascript">
+    var popingup = false;
+    var w = window.innerWidth;
+    var h = window.innerHeight;
+    var videoIds = ["XGSy3_Czz8k", "5M4ex28qxFM", "zXKUDKGXi1c", "HkMNOlYcpHg"];
+    $(document).ready(function(){
+        myNewFlow = new ContentFlow('theflow', {endOpacity:0.5, visibleItems:4, relativeItemPosition:'center top', maxItemHeight:0.5*h, flowSpeedFactor:0.5});
+        
+        var items = document.getElementById("anchorToAddImage").getElementsByTagName("div");
+        for(var i = 0; i < items.length; i++){
+            items[i].getElementsByTagName("img")[0].src = "http://img.youtube.com/vi/" + videoIds[i] + "/0.jpg";
+        }
+
+        $(document).keydown(function(e){
+            if(e.which == 88){
+                alert(myNewFlow.getActiveItem()["index"]);
+            }
+        });
+
+        $(document).keydown(function(e){
+            if(e.which == 90){
+                if(popingup == false){
+                    var url = "youtube.html?id=" + videoIds[myNewFlow.getActiveItem()["index"]];
+                    $.colorbox({iframe:true, id:"popup", href:url, innerWidth:648, innerHeight:396, onComplete:function(){document.getElementById("cboxLoadedContent").getElementsByTagName("iframe")[0].focus();}});
+                    popingup = true;
+                }else{
+                    $.colorbox.close();
+                    popingup = false;
+                }
+            }
+        });
+    });
+</script>
 </body>
 </html>
