@@ -24,11 +24,19 @@ function moveToNxt(){
     myNewFlow.moveTo(nxt['index']);
 }
 
-function getFileName(){
+function getFile(){
     var object = myNewFlow.getActiveItem();
     var idx = Number(object['index']);
+    popPDF(pdflist[idx]);
+}
+
+function popPDF(filename){
+  var url = './viewer.html?filename='+filename;
     var x = document.getElementById("demo");
-    x.innerHTML = "<font color='red'>"+pdflist[idx]+"</font>";
+    x.innerHTML = "<font color='red'>"+url+"</font>";
+  $.colorbox({iframe:true, href:url, width:"70%", height:"100%", onComplete:function(){
+    document.getElementById("cboxLoadedContent").getElementsByTagName("iframe")[0].focus();
+  }});
 }
 
 function getPDFThumbnail(idx, pdf_name) {
