@@ -2,42 +2,40 @@
 <html>
 <head>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
-  <script language="JavaScript" type="text/javascript" src="ContentFlow/contentflowsetting.js"></script>
+  <!--<script language="JavaScript" type="text/javascript" src="ContentFlow/contentflowsetting.js"></script>-->
   <script language="JavaScript" type="text/javascript" src="ContentFlow/contentflow.js"></script>
-
+  <link rel="stylesheet" href="colorbox_gallery/colorbox.css">
+  <script src="colorbox_gallery/jquery.colorbox.js"></script>
+  <script language="JavaScript" type="text/javascript" src="js/gallery.js"></script>
 </head>
 <body background="img/bg_black.jpg" onload = "controlpad_initialization()" onresize="controlpad_initialization()">
- 
 <!--Content Flow-->
 <br><br><br><br><br><br>
-<div id="flow" class="ContentFlow">
-    <div  class="flow"  >
-      <div class="item">
-        <img class="content" src='img/123.png'> </img>
+<div id="theflow" class="ContentFlow">
+    <div class="flow"  >
+      <div class="item" id="div_img0"> 
+        <img class="content" id="img0" src='galleryImg/image0.jpg'></img>
       </div>
-      <div class="item">
-        <img class="content" src='img/123.png'> </img>
+      <div class="item" id="div_img1">
+        <img class="content" id="img1" src='galleryImg/image1.jpg'> </img>
       </div> 
-      <div class="item">
-        <img class="content" src='img/123.png'> </img>
+      <div class="item" id="div_img2">
+        <img class="content" id="img2" src='galleryImg/image2.jpg'> </img>
       </div> 
-      <div class="item">
-        <img class="content" src='img/123.png'> </img>
+      <div class="item" id="div_img3">
+        <img class="content" id="img3" src='galleryImg/image3.jpg'> </img>
       </div> 
-      <div class="item">
-        <img class="content" src='img/123.png'> </img>
+      <div class="item" id="div_img4">
+        <img class="content" id="img4" src='galleryImg/image4.jpg'> </img>
       </div> 
-      <div class="item">
-        <img class="content" src='img/123.png'> </img>
+      <div class="item" id="div_img5">
+        <img class="content" id="img5" src='galleryImg/image5.jpg'> </img>
       </div> 
-      <div class="item">
-        <img class="content" src='img/123.png'> </img>
+      <div class="item" id="div_img6">
+        <img class="content" id="img6" src='galleryImg/image6.jpg'> </img>
       </div>
     </div>
-
     <div class="loadIndicator"></div>
-</div>
-    
-
+</div> 
 </body>
 </html>
