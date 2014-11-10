@@ -1,63 +1,124 @@
-#controlpad{
-    position: absolute;
+  /* for grab prograss bar */
+body{
+  font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif;
+}
+
+#output{
+  font-size: 66px;
+  color: #005d98;
+  text-align: left;
+  position: fixed;
+  bottom: 18px;
+}
+
+#progress {
+  background: #005d98;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: 16px;
+  width: 0%;
+}
+img#connect-leap{
+  /* this can be removed with leapjs-plugins 0.1.4.1 */
+  max-width: 100%;
+}
+
+.block{ height: 20px; width: 100px; background-color: black;}
+
+#imageBlur{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -200px; /*half the image width*/
+  margin-top: -200px; /*half the image height*/
+  z-index: 11;
+}
+
+.box{ position: absolute;
     width: 400px; /*width*/
     height: 400px; /*height*/
     left: 50%;
     top: 50%;
     margin-left: -200px; /*half the image width*/
     margin-top: -200px; /*half the image height*/
-    display: none;
+    z-index: 11;
+    /*display: none;*/
+}
+.trigger{ width:400px; height: 400px; position: absolute; z-index: 10; left:0px;
+          top:0px; /*background-image:url(../img/big_round.png); cursor: pointer;*/}
+.popcircle{ position:absolute; z-index: 9; width:400px; height:400px;}
+.popcircle ul{ list-style:none; padding:0px; margin: 0px; height: auto; /*cursor: pointer;*/}
+.popcircle ul li{top: 50px; left: 50px; height: 300px; width: 300px; position: absolute; opacity: 0.01}
+
+#pops2 .upicon{
+    position:absolute; 
+    height: 80%;
+    margin-top:20px;
+    margin-left:30px;
+}
+#pops2 .lefticon{
+    position:absolute; 
+    height: 80%;
+    margin-top: 20px;
+    margin-left:30px;
+}
+#pops2 .righticon{
+    position:absolute; 
+    height: 80%;
+    margin-top:20px;
+    margin-left:30px;
+}
+#pops2 .downicon{
+    position:absolute; 
+    height: 80%;
+    margin-top:20px;
+    margin-left:30px;
 }
 
-#controlpad .upicon{
-    position:absolute; 
-    height: 40%;
-    top: -10%;
-    left: 30%;
-    margin: 0;
-}
-#controlpad .lefticon{
-    position:absolute; 
-    height: 40%;
-    top: 25%;
-    left: -5%;
-    margin: 0;
-}
-#controlpad .righticon{
-    position:absolute; 
-    height: 40%;
-    top:25%;
-    left: 65%;
-    margin: 0;
-}
-#controlpad .downicon{
-    position:absolute; 
-    height: 40%;
-    top:60%;
-    left:30%;
+#umsk{
+    z-index: -1;
+    opacity:0.8;
+    
 }
 
-#greyscreen{
-    position: absolute;
-    left: 0;
-    top: 0;
-    background: #FFF;
-    opacity: 0.15;
-    display: none;
+#rmsk{
+    z-index: -1;
+    opacity:0.8;
 }
 
-#cursor{
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    margin: 0px;
-    z-index: 9;
-    /*cursor:none;*/
+#lmsk{
+    z-index: -1;
+    opacity:0.8;
 }
 
-html, body{
-  overflow: hidden;
-  width:  100%;
-  height: 100%;
-  margin: 0px;
+#dmsk{
+    z-index: -1;
+    opacity:0.8;
+}
+
+body{
+    -khtml-user-select: none;
+    -o-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.enableBlur { 
+  filter: url(blur.svg#blur); /* FireFox, Chrome, Opera */
+  -webkit-transition:-webkit-filter 0.1s ease-in-out;
+  -webkit-filter: blur(10px) brightness(30%); /* Chrome, Opera */
+       -moz-filter: blur(50px);
+        -ms-filter: blur(10px);    
+            filter: blur(10px); 
+}
+
+.disableBlur { 
+  filter: url(blur.svg#blur); /* FireFox, Chrome, Opera */
+  -webkit-transition:-webkit-filter 0.2s ease-in-out;
+  -webkit-filter: blur(-1px); /* Chrome, Opera */
+       -moz-filter: blur(50px);
+        -ms-filter: blur(10px);    
+            filter: blur(10px); 
 }

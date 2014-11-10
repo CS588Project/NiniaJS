@@ -113,25 +113,6 @@ var CustomStyle = (function CustomStyleClosure() {
   return CustomStyle;
 })();
 
-$(document).ready(function () {
-  filename = getUrlParameter('filename');
-  DEFAULT_URL = '../../../PDF'+filename;
-});
-
-function getUrlParameter(sParam)
-{
-    var sPageURL = window.location.search.substring(1);
-    var sURLVariables = sPageURL.split('&');
-    for (var i = 0; i < sURLVariables.length; i++) 
-    {
-        var sParameterName = sURLVariables[i].split('=');
-        if (sParameterName[0] == sParam) 
-        {
-            return sParameterName[1];
-        }
-    }
-}    
-
 function getFileName(url) {
   var anchor = url.indexOf('#');
   var query = url.indexOf('?');
@@ -5469,13 +5450,40 @@ var DocumentAttachmentsView = function documentAttachmentsView(attachments) {
   }
 };
 
-
-
 function webViewerLoad(evt) {
   PDFView.initialize().then(webViewerInitialized);
 }
 
+$(document).ready(function(){
+  $(document).keydown(function(e){
+      if(e.which == 90){
+        closePopUp();
+      }
+  });
+});
+
+function closePopUp(){
+  parent.jQuery.colorbox.close();
+}
+
+function getUrlParameter(sParam)
+{
+    var sPageURL = window.location.search.substring(1);
+    var sURLVariables = sPageURL.split('&');
+    for (var i = 0; i < sURLVariables.length; i++) 
+    {
+        var sParameterName = sURLVariables[i].split('=');
+        if (sParameterName[0] == sParam) 
+        {
+            return sParameterName[1];
+        }
+    }
+}    
+
 function webViewerInitialized() {
+  var filename = getUrlParameter('filename');
+  DEFAULT_URL = '../../../PDF/'+filename;
+
   var params = PDFView.parseQueryString(document.location.search.substring(1));
   var file = 'file' in params ? params.file : DEFAULT_URL;
 

@@ -1,117 +1,177 @@
-var control_open = false;
-var w = window.innerWidth;
-var h = window.innerHeight;
+//global var
+var triggerFlag;
+var menuClickFlag;
 
-function controlpad_initialization(){
-  w = window.innerWidth;
-  h = window.innerHeight;
-  document.getElementById("cursor").width =  w;
-  document.getElementById("cursor").height =  h;
-}
+$(document).ready(function(){
+  triggerFlag = false;
+  $(".blur").addClass("disableBlur");
+  var canvasElement=document.getElementById("myCanvas");
+  var displayArea=canvasElement.getContext("2d");
+  $('.trigger').on('dblclick', function(e){
+    //console.log("aaaaaaaa");
+    e.preventDefault();
+    $.popcircle('#pops2',{
+              spacing:'150px',
+              type:'full', // full, half, quad
+              offset:0, // 0, 1, 2, 3, 4, 5, 6, 7 or 5.1
+              ease:'easeOutQuad',
+              time:'fast' // slow, fast, 1000
+              }
+           );
+  }); 
 
-function cursor(event){
-  var cX = event.clientX;  
-  var cY = event.clientY;
-  var curs_ctx = document.getElementById("cursor").getContext("2d");
-  //cursor
-  curs_ctx.beginPath();
-  curs_ctx.clearRect(0,0,w,h);
-  curs_ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
-  curs_ctx.arc(cX, cY, 20, 0, 2*Math.PI);
-  curs_ctx.shadowColor = '#FFFFFF';
-  curs_ctx.shadowBlur = 20;
-  curs_ctx.moveTo(cX, cY);
-  curs_ctx.fill();
-  curs_ctx.closePath();
-
-  //control pad
-  padControl(event);
-}
-
-function showControlPad(){
-  $("#greyscreen").css({ "display": "block", "width":$(document).width(),"height":$(document).height()}); 
-  $("#controlpad").show(700, function(){ control_open = true;});
-}
-
-function hideControlPad(){
-  $("#controlpad").hide(700, function(){ control_open = false;});
-  $("#greyscreen").css({ "display": "none", "width":$(document).width(),"height":$(document).height()}); 
-}
-
-function goVedio(){
-  location.href='./video.html'
-}
-
-function goCanvas(){
-  location.href='./canvas.html'
-}
-
-function goGallery(){
-  location.href='./gallery.html'
-}
-
-function goPDF(){
-  location.href='./pdf.html'
-}
-
-function padControl(event){
-  var divCX =  window.innerWidth/2;
-  var divCY =  window.innerHeight/2;
-  var cX = event.clientX;  
-  var cY = event.clientY;
-  var offsetx = cX - divCX;
-  var offsety = cY - divCY;
+  /********************************************************
+  * This is the actual example part where we call grabStrength
+  *****************************************************/
+  // Set up the controller:
+  var controllerOptions = {enableGestures: true, background: true};
+  Leap.loop(controllerOptions, {
+    hand: function(hand){
+      var output = document.getElementById("output"),
+      progress = document.getElementById("progress");
+      output.innerHTML = hand.grabStrength.toPrecision(2);
+      progress.style.width = hand.grabStrength * 100 + '%';
+      if(hand.grabStrength >= 0.8 && triggerFlag == false){
+        $('.trigger').trigger("dblclick");
+        //triggerFlag = true;
+      }
+      if(hand.grabStrength < 0.8 && triggerFlag == true){
+        $('.trigger').trigger("dblclick");
+        //triggerFlag = false;
+      }
+    },
+    frame: function(frame){
+      if(frame.pointables.length > 0){
+        canvasElement.width = canvasElement.width; //clear
+        
+        //Get a pointable and normalize the tip position
+        var pointable = frame.pointables[0];
+        var interactionBox = frame.interactionBox;
+        var normalizedPosition = interactionBox.normalizePoint(pointable.tipPosition, true);
+        
+        // Convert the normalized coordinates to span the canvas
+        var canvasX = canvasElement.width * normalizedPosition[0];
+        var canvasY = canvasElement.height * (1 - normalizedPosition[1]);
+        //we can ignore z for a 2D context
+        
+        displayArea.strokeText("(" + canvasX.toFixed(1) + ", " + canvasY.toFixed(1) + ")", canvasX, canvasY);
+        var coords4 = "canvasX: " + canvasX + ", canvasY: " + canvasY + ", canvasWidth:" 
+                      + canvasElement.width+" canvasHeight:"+ canvasElement.height;
+        document.getElementById("demo4").innerHTML = "<font color=\"red\">" + coords4+"</font>";
+        centralPad(null, canvasX, canvasY);
+      }
+    }
+  });
+  /*********************************************************
+  * End of the actual example
+  ****************************************************/
+});
+function centralPad(event, leapCanvasX, leapCanvasY){
+  var div_pos = $(".box").position();
+  var divCX = div_pos.left;
+  var divCY = div_pos.top;
+  if(event != null){
+    var cX = event.clientX;  
+    var cY = event.clientY;
+    var offsetx = cX - divCX;
+    var offsety = cY - divCY;
+  }
+  else{
+    var offsetx = leapCanvasX-200;
+    var offsety = leapCanvasY-200;
+  }
   var umsk = document.getElementById("umsk");
   var lmsk = document.getElementById("lmsk");
   var rmsk = document.getElementById("rmsk");
   var dmsk = document.getElementById("dmsk");
-  
-  var coords1 = "offsetx: " + offsetx + ", offsety: " + offsety;
-  document.getElementById("demo").innerHTML = "<font color=\"red\">" + coords1+"</font>";
-
   lmsk.style.opacity = "0.0";
   umsk.style.opacity = "0.0";
   rmsk.style.opacity = "0.0";
-  dmsk.style.opacity = "0.0"; 
+  dmsk.style.opacity = "0.0";
 
-  if(control_open){
-    if (Math.abs(offsetx) > Math.abs(offsety)) {
-      if(offsetx <= 0){
-        lmsk.style.clip = "rect(0px, 200px, 200px, "+(200+offsetx)+"px)";
-        lmsk.style.opacity = "0.9";
-        if(offsetx < -200){
-          lmsk.style.opacity = "0.0";
-          $(".lefticon").animate({
-            top:'-=25%', left:'-=25%', height:'+=50%', opacity:'0.0'}, 900, function() {goPDF()})
-        }
-      }else{
-        rmsk.style.clip = "rect(0px, "+offsetx+"px, 200px, 0px)";
-        rmsk.style.opacity = "0.9";
-        if(offsetx > 200){
-          rmsk.style.opacity = "0.0";
-          $(".righticon").animate({
-            top:'-=25%', left:'-=25%', height:'+=50%', opacity:'0.0'},900, function() {goVedio()})
-        }
-      }
-    } 
-    else{
-      if(offsety <= 0){
-        umsk.style.clip = "rect("+(200+offsety)+"px, 200px, 200px, 0px)";
-        umsk.style.opacity = "0.9";
-        if(offsety < -200){
-          umsk.style.opacity = "0.0";
-          $(".upicon").animate({
-            top:'-=25%', left:'-=25%', height:'+=50%', opacity:'0.0'},900, function() {goGallery()})
-        }
-      }else{
-        dmsk.style.clip = "rect(0px, 200px, "+offsety+ "px, 0px)";
-        dmsk.style.opacity = "0.9";
-        if(offsety > 200){
-          dmsk.style.opacity = "0.0";
-          $(".downicon").animate({
-            top:'-=25%', left:'-=25%', height:'+=50%', opacity:'0.0'},900, function() {goCanvas()})
-        }
+  if (Math.abs(offsetx) > Math.abs(offsety)) {
+    if(offsetx <= 0){
+      lmsk.style.clip = "rect(0px, 400px, 400px, "+(200+offsetx)+"px)";
+      lmsk.style.opacity = "0.9";
+      if(offsetx < -190 && triggerFlag == true){
+        lmsk.style.opacity = "0.0";
+        $(".lefticon").animate({
+          top:'-=25%', left:'-=25%', height:'+=50%', opacity:'0.0'},700, 
+          function(){ location.href='./pdf.html';})
       }
     }
+    else{
+      rmsk.style.clip = "rect(0px, "+(offsetx+50)+"px, 400px, 0px)";
+      rmsk.style.opacity = "0.9";
+      if(offsetx > 190 && triggerFlag == true){
+        rmsk.style.opacity = "0.0";
+        $(".righticon").animate({
+          top:'-=25%', left:'-=25%', height:'+=50%', opacity:'0.0'},700, 
+          function(){ location.href='./video.html';})
+      }
+    }
+  } 
+  else{
+    if(offsety <= 0){
+      umsk.style.clip = "rect("+(200+offsety)+"px, 400px, 400px, 0px)";
+      umsk.style.opacity = "0.9";
+      if(offsety < -190 && triggerFlag == true){
+        umsk.style.opacity = "0.0";
+        $(".upicon").animate({
+          top:'-=25%', left:'-=25%', height:'+=50%', opacity:'0.0'},700, 
+          function(){ location.href='./gallery.html';})
+      } 
+    }
+    else{
+      dmsk.style.clip = "rect(0px, 400px, "+(50+offsety)+ "px, 0px)";
+      dmsk.style.opacity = "0.9";
+      if(offsety > 190 && triggerFlag == true){
+        dmsk.style.opacity = "0.0";
+        $(".downicon").animate({
+          top:'-=25%', left:'-=25%', height:'+=50%', opacity:'0.0'},700, 
+          function(){ location.href='./canvas.html';})
+      }
+    }
+  }
+
+  var coords1 = "offsetx: " + offsetx + ", offsety: " + offsety;
+  var coords2 = "div_pos.left: " + divCX + ", div_pos.top: " + divCY;
+  var coords3 = "event.clientX: " + cX + ", event.clientY: " + cY;
+  document.getElementById("demo").innerHTML = "<font color=\"red\">" + coords1+"</font>";
+  document.getElementById("demo2").innerHTML = "<font color=\"red\">" + coords2+"</font>";
+  document.getElementById("demo3").innerHTML = "<font color=\"red\">" + coords3+"</font>";
+  cursor(event, leapCanvasX, leapCanvasY);
+}
+
+function cursor(event, leapCanvasX, leapCanvasY){
+  var div_pos = $(".box").position();
+  var divCX = div_pos.left;
+  var divCY = div_pos.top;
+  if(event != null){
+    var cX = event.clientX;  
+    var cY = event.clientY;
+    var offsetx = cX - divCX;
+    var offsety = cY - divCY;
+  }
+  else{
+    var offsetx = leapCanvasX-200;
+    var offsety = leapCanvasY-200;
+  }
+
+  var canvasElement=document.getElementById("myCanvas");
+  var displayArea=canvasElement.getContext("2d");  //cursor
+  if(triggerFlag){
+    displayArea.beginPath();
+    displayArea.clearRect(0,0,canvasElement.width,canvasElement.height);
+    displayArea.fillStyle = 'rgba(200, 200, 200, 0.3)';
+    displayArea.arc(offsetx+200, offsety+200, 20, 0, 2*Math.PI);
+    displayArea.shadowColor = '#FFFFFF';
+    displayArea.shadowBlur = 20;
+    //displayArea.moveTo(offsetx+divCX, offsety+divCY);
+    displayArea.fill();
+    displayArea.closePath();
+  }
+  else{
+    displayArea.clearRect(0,0,canvasElement.width,canvasElement.height);
   }
 }

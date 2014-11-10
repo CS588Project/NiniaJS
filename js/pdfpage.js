@@ -31,7 +31,7 @@ function getFile(){
 }
 
 function popPDF(filename){
-  var url = './viewer.html?filename='+filename;
+  var url = './js/pdfjs/web/viewer.html?filename='+filename;
     var x = document.getElementById("demo");
     x.innerHTML = "<font color='red'>"+url+"</font>";
   $.colorbox({iframe:true, href:url, width:"70%", height:"100%", onComplete:function(){
