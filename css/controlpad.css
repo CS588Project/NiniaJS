@@ -19,6 +19,7 @@ body{
   height: 16px;
   width: 0%;
 }
+
 img#connect-leap{
   /* this can be removed with leapjs-plugins 0.1.4.1 */
   max-width: 100%;
@@ -95,6 +96,60 @@ img#connect-leap{
 #dmsk{
     z-index: -1;
     opacity:0.8;
+}
+
+#help1{
+  position: absolute;
+  height: 19%;
+  margin: 0px;
+  top: 12%;
+  opacity: 0;
+  left: -30%;
+}
+
+#help2{
+  position: absolute;
+  height: 19%;
+  margin: 0px;
+  top: 40%;
+  left: -30%;
+  opacity: 0;
+}
+
+#help3{
+  position: absolute;
+  height: 19%;
+  margin: 0px;
+  top: 68%;
+  left: -30%;
+  opacity: 0;
+}
+
+#help4{
+  position: absolute;
+  height: 19%;
+  margin: 0px;
+  top: 12%;
+  right: -30%;
+  opacity: 0;
+}
+
+#help5{
+  position: absolute;
+  height: 19%;
+  margin: 0px;
+  top: 40%;
+  right: -30%;
+  opacity: 0;
+}
+
+#help6{
+  position: absolute;
+  height: 19%;
+  margin: 0px;
+  top: 68%;
+  right: -30%;
+  opacity: 0;
 }
 
 body{

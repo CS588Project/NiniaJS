@@ -1,189 +1,549 @@
-var pen_begin = 0;
-var color_begin = 0;
-var pen_offset = 3.6;
-var color_offset = 2;
-var pen_wheel_expand = false;
-var color_wheel_expand = false;
-var w = window.innerWidth;
-var h = window.innerHeight;
-var color = ['White', 'DarkGray', 'BlueViolet', 'Blue', 'Green', 'Yellow', 'DarkOrange', 'Red', 'SaddleBrown', 'Cyan'];
-var pensize = [1, 2, 4, 8, 12, 16, 20, 18, 14, 10, 6];
-var drawing = 0; //['off', 'draw', 'erase']
-var draw_off = 0, draw_on = 1, draw_erase=2;
+//global variables
+var canvas = null, ctx = null; // canvas context
+var started = false; 
+var globalGesture = null;   
+var timer = null; // used to detech shaking hands by recognizing KeyTap getsture
+var timerStarted = false;
+var keyTapNum = 0;
+var cur_state="IDLE",prev_state=null;
+var eraseStarted = false;
+var colorPaletteStarted = false;
+var globalColor = "black";
+var iniColorGroup1 = 0,iniColorGroup4 = 90, iniColorGroup3 = 180, iniColorGroup2 = 270, stepAngle = 0, curColorGroup = 1;
+var reg1,reg2 = true;
+var circleDirection;
 
-function initialization(){ 
-  w = window.innerWidth;
-  h = window.innerHeight;
-  document.getElementById("maincanvas").width =  w;
-  document.getElementById("maincanvas").height =  h;
-  document.getElementById("cursor").width =  w;
-  document.getElementById("cursor").height =  h;
-  document.getElementById("colorwheel").style.left = (w-600).toString()+'px';
-  document.getElementById("penwheel").style.top = (h-600).toString()+'px';
-  document.getElementById("penwheel").style.left = (w-600).toString()+'px';
-  document.getElementById("seletedpensize").style.top = (h-50).toString()+'px';
-  hidePenWheel();
-  hideColorWheel();
-}
-
-function switchdraw(){
-  var main_ctx = document.getElementById("maincanvas").getContext("2d");
-  var curs_ctx = document.getElementById("cursor").getContext("2d");
-
-  if(color_wheel_expand){
-    hideColorWheel();
-  } else if(pen_wheel_expand) {
-    hidePenWheel();
-  } else {
-    if(drawing == draw_off){
-      drawing = draw_on;
-      main_ctx.beginPath();
-    } else {
-      drawing = draw_off;
-      main_ctx.closePath();
-    }
-  }
-}
-
-function eraser(){
-  var main_ctx = document.getElementById("maincanvas").getContext("2d");
-
-  drawing = draw_erase;
-  main_ctx.beginPath();
-}
-
-function draw(event){
-  var cX = event.clientX;  
-  var cY = event.clientY;
-  var curs_ctx = document.getElementById("cursor").getContext("2d");
-  var mc = document.getElementById("maincanvas");
-  var main_ctx = mc.getContext("2d");
-  var esize = pensize[pen_begin%10]*8+40;
+$(document).ready(function() {  
+  canvas = document.getElementById("myCanvas")
+    var curColor = "red"; 
+  var sizeSmall=5;
+  var sizeNormal=10;
+  var sizeLarge=15;
+  var curSize=sizeNormal;
+  $(window).resize(resizeCanvas);
+  resizeCanvas();
+  function resizeCanvas() {
+    $("#myCanvas").attr("width", $(window).get(0).innerWidth);
+    $("#myCanvas").attr("height", $(window).get(0).innerHeight);
+  };
+  //Initialize the color palette
+  $(".group1").children().eq(0).addClass("colorDegree270");
+  $(".group1").children().eq(1).addClass("colorDegree300");
+  $(".group1").children().eq(2).addClass("colorDegree330");
+  $(".group4").children().eq(0).addClass("colorDegree0");
+  $(".group4").children().eq(1).addClass("colorDegree30");
+  $(".group4").children().eq(2).addClass("colorDegree60");
+  $(".group3").children().eq(0).addClass("colorDegree90");
+  $(".group3").children().eq(1).addClass("colorDegree120");
+  $(".group3").children().eq(2).addClass("colorDegree150"); 
   
-  //paint control
-  if (drawing == draw_on) {
-    document.getElementById("msg").innerHTML = "<font color='red'> cursor position: " + cX +","+ cY +" </font>";
-    main_ctx.lineTo(cX, cY);
-    main_ctx.lineCap = 'round';
-    main_ctx.lineWidth = pensize[pen_begin%10];
-    main_ctx.strokeStyle = color[color_begin%10];
-    main_ctx.stroke();
-  } else if(drawing == draw_erase) {
-    main_ctx.clearRect(cX-esize/2, cY-esize/2, esize, esize);
-  } else {
-    main_ctx.moveTo(cX, cY);
-    if(color_wheel_expand && !pen_wheel_expand){
-      color_begin = Math.ceil(cY/30);
-      colorWheel(250, 120);
-      document.getElementById("seletedcolor").innerHTML = "<font color="+color[color_begin%10]+">" + (color_begin%10)+"</font>";
-    } else {
-      if(!pen_wheel_expand) expandColorWheel(event);
-    }
-
-    if(pen_wheel_expand){
-      pen_begin = Math.ceil(cY/30);
-      penWheel(250);
-      document.getElementById("seletedpensize").innerHTML = "<font color='white'>" + pensize[pen_begin%10]+"</font>";
-    } else {
-      if(!color_wheel_expand) expandPenWheel(event);
-    }
-  }
-
-  //cursor    
-  curs_ctx.beginPath();
-  curs_ctx.clearRect(0,0,w,h);
-  curs_ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
-
-  if(drawing == draw_erase){
-    curs_ctx.rect(cX-esize/2, cY-esize/2, esize, esize);
-  } else if(drawing == draw_on) {
-    curs_ctx.arc(cX, cY, 3+pensize[pen_begin%10], 0, 2*Math.PI);
-    curs_ctx.fillStyle = color[color_begin%10];
-  } else {
-    if(pen_wheel_expand || color_wheel_expand){
-      var arrow = new Image();
-      arrow.src = "./img/darrow.png";
-      curs_ctx.drawImage(arrow,w-80, cY-100, 30, 200);
-    } else {
-      cursor(event);
-    }
-  }
+  $(".group2").children().eq(0).addClass("colorDegree180");
+  $(".group2").children().eq(1).addClass("colorDegree210");
+  $(".group2").children().eq(2).addClass("colorDegree240");
   
-  curs_ctx.shadowBlur = 20;
-  curs_ctx.moveTo(cX, cY);
-  curs_ctx.fill();
-  curs_ctx.closePath();
+  //canvas context
+  ctx=document.getElementById("myCanvas").getContext("2d");
+  ctx.fillStyle="black";
+  ctx.fillRect(0,0,$(window).get(0).innerWidth,$(window).get(0).innerHeight);
+  ctx.beginPath();  
+  });
+  // Setup Leap loop with frame callback function
+  var controllerOptions = {enableGestures: true};
+
+  Leap.loop(controllerOptions, function(frame) {
+
+    // Create circle to represent finger
+    var canvasElement = document.getElementById("myCanvas");
+    var cursorLeapMotion = document.getElementById("leapCursor");
+    var distanceDisplay = document.getElementById("distance");
+
+  if(frame.pointables.length > 0){
+    overlappingDetection();
+    var pointable = frame.pointables[1];
+    var interactionBox = frame.interactionBox;
+    var normalizedPosition = interactionBox.normalizePoint(pointable.tipPosition, true);
+    var cursorX = window.innerWidth * normalizedPosition[0];
+    var cursorY = window.innerHeight * (1 - normalizedPosition[1]);
+    cursorLeapMotion.style.left = cursorX/window.innerWidth*100+"%"
+    cursorLeapMotion.style.top = cursorY/window.innerHeight*100+"%"
+    if (frame.hands.length > 0){
+      for (var i = 0; i < frame.hands.length; i++) {
+        var hand = frame.hands[i];
+        if( hand.pinchStrength==0 ){
+          globalGesture = "Erase";
+          cursorLeapMotion.innerHTML = "Erase Cursor";
+        }
+        else{
+          globalGesture = "Draw";
+          cursorLeapMotion.innerHTML = "Draw Cursor";
+        }
+      }
+    }
+    
+    if( globalGesture=="Erase" ){
+      var touchDistance = pointable.touchDistance;
+      if(touchDistance<0){
+        prev_state = cur_state
+        cur_state = "ERASE_ON";
+        cursorLeapMotion.style.backgroundColor="rgb(255,0,0)";
+        if(prev_state=="ERASE_OFF"||prev_state=="DRAW_ON"){
+          //console.log("Prev state: DRAW_ON ");
+          ctx.beginPath();
+          ctx.strokeStyle="black";
+          ctx.lineWidth=40;
+          started = true;
+        }           
+        if(started==false)
+          leapTouchDown(cursorX,cursorY);
+        else
+          leapTouchMove(cursorX,cursorY);
+      }
+      else{
+        leapTouchUp();
+        prev_state = cur_state
+        cur_state = "ERASE_OFF";
+        cursorLeapMotion.style.backgroundColor="rgb(0,255,0)";
+      }
+    }else if( globalGesture=="Draw" ){
+      var touchDistance = pointable.touchDistance;
+      if(touchDistance<0){
+        prev_state = cur_state;
+        cur_state = "DRAW_ON";
+        cursorLeapMotion.style.backgroundColor="rgb(255,0,0)";
+        if(prev_state=="DRAW_OFF" || prev_state=="ERASE_ON"){
+          ctx.beginPath();
+          ctx.strokeStyle=globalColor;
+          ctx.lineWidth=10;
+          started = true;
+        }
+        if(started==false)
+          leapTouchDown(cursorX,cursorY);
+        else
+          leapTouchMove(cursorX,cursorY);
+      }
+      else{
+        prev_state = cur_state;
+        cur_state = "DRAW_OFF";
+        cursorLeapMotion.style.backgroundColor="rgb(0,255,0)";
+        leapTouchUp();
+      }
+      distanceDisplay.innerText = touchDistance;
+        }
+    
+    if(colorPaletteStarted==true){
+      if( Math.sqrt(cursorX*cursorX+cursorY*cursorY)>100 )
+         mouseMove(null,cursorX,cursorY);
+    }
+  
+  //console.log(curColorGroup);
+}  
+  if (frame.gestures.length > 0) {  
+    var gestureString = null;
+    for (var i = 0; i < frame.gestures.length; i++) {
+      var gesture = frame.gestures[i];
+      gestureString += "Gesture ID: " + gesture.id + ", "
+              + "type: " + gesture.type + ", "
+              + "state: " + gesture.state + ", "
+              + "hand IDs: " + gesture.handIds.join(", ") + ", "
+              + "pointable IDs: " + gesture.pointableIds.join(", ") + ", "
+              + "duration: " + gesture.duration + " &micro;s, ";
+              
+      switch (gesture.type) {
+
+        case "circle":
+        /*
+        keyTapNum++;
+        if(globalGesture=="Erase"&&!timerStarted){
+          timer = self.setInterval("checkKeyTapNum()",2000);
+          timerStarted = true;
+        }
+        console.log("circle");
+        */
+        circle = frame.gestures[0];
+        // Get Pointable object
+        circle.pointable = frame.pointable(circle.pointableIds[0]);
+        // Reset circle gesture variables as nedded, not really necessary in this case
+        if(circle.state == 'start') {
+          clockwise = true;
+        } else if (circle.state == 'update') {
+          direction = circle.pointable.direction;
+          // Check if pointable exists
+          if(direction) {
+            normal = circle.normal;
+            // Check if product of vectors is going forwards or backwards
+            // Since Leap uses a right hand rule system
+            // forward is into the screen, while backwards is out of it
+            clockwise = Leap.vec3.dot(direction, normal) > 0;
+              if(clockwise) {
+                //Do clockwose stuff
+                circleDirection = "clockwise";
+                console.log("clockwise");
+              } else {
+                  //Do counterclockwise stuff
+                console.log("counterclockwise");
+                circleDirection = "counterclockwise";
+              }
+          }
+        }
+         reg1 = reg2
+         if( gesture.state=="update" ){
+          reg2 = true;
+         }else if( gesture.state=="stop" ){
+          reg2 = false;
+         }
+         if( reg1 & (!reg2)){
+          console.log("Circle Ends");
+          if(circleDirection=="clockwise"&&started==false){
+            increaseColorGroup();
+          }
+          else if(circleDirection=="counterclockwise"&&started==false){
+            decreaseColorGroup();
+          }
+        }
+        break;
+        /*
+        case "swipe":
+        gestureString += "start position: " + vectorToString(gesture.startPosition) + " mm, "
+                + "current position: " + vectorToString(gesture.position) + " mm, "
+                + "direction: " + vectorToString(gesture.direction, 1) + ", "
+                + "speed: " + gesture.speed.toFixed(1) + " mm/s";
+        break;
+        */
+        case "screenTap":
+        break;
+        
+        case "keyTap":
+        keyTapNum++;
+        gestureString += "position: " + vectorToString(gesture.position) + " mm";
+        if(globalGesture=="Erase"&&!timerStarted){
+          timer = self.setInterval("checkKeyTapNum()",2000);
+          timerStarted = true;
+          console.log("Timer started.");
+        }
+        
+        console.log("keyTap");
+        break;
+        default:
+      }
+      gestureString += "<br />";
+    }
+  } 
 }
+)
 
-function expandColorWheel(event){
-  var cX = event.screenX;  
-  var cY = event.screenY;
+var overlaps = (function () {
+  function getPositions( elem ) {
+    var pos, width, height;
+    pos = $( elem ).position();
+    width = $( elem ).width();
+    height = $( elem ).height();
+    return [ [ pos.left, pos.left + width ], [ pos.top, pos.top + height ] ];
+  }
 
-  if(cX > (w-100) && cY < 200){
-    color_wheel_expand = true;
-    colorWheel(250, 120);
+  function comparePositions( p1, p2 ) {
+    var r1, r2;
+    r1 = p1[0] < p2[0] ? p1 : p2;
+    r2 = p1[0] < p2[0] ? p2 : p1;
+    return r1[1] > r2[0] || r1[0] === r2[0];
+  }
+    return function ( a, b ) {
+  var pos1 = getPositions( a ),
+    pos2 = getPositions( b );
+  return comparePositions( pos1[0], pos2[0] ) && comparePositions( pos1[1], pos2[1] );
+  };
+})();
+
+function overlappingDetection(){
+  
+  var leapCursor = $( '#leapCursor' )[0];
+  var colorPalette = document.getElementById("colorPalette");
+  
+  if(overlaps( leapCursor, colorPalette )==true){
+    console.log("Leap overlaps Color Palette");
+    colorPaletteStarted = true;
+    triggerColorPallette();
   }
 }
 
-function hideColorWheel(){  
-  color_wheel_expand = false;
-  colorWheel(100, 100);
+function leapTouchDown(leapX,leapY){
+  ctx.beginPath(); 
+  started = true;  
+}
+function leapTouchMove(leapX,leapY){
+  ctx.lineTo(leapX, leapY);  
+  ctx.stroke();  
+}
+function leapTouchUp(){
+  started = false;
+}
+      
+function vectorToString(vector, digits){
+  if (typeof digits === "undefined") {
+      digits = 1;
+  }
+  return "(" + vector[0].toFixed(digits) + ", "
+      + vector[1].toFixed(digits) + ", "
+      + vector[2].toFixed(digits) + ")";
 }
 
-function colorWheel(r, size){
-  var ctx = document.getElementById("colorwheel").getContext("2d");
-
-  ctx.clearRect(0,0,600,600);
-
-  ctx.shadowColor = '#999';
-  ctx.shadowBlur = 50;
-
-  for (var i = 0; i < 10; i++) {
-    var start = color_offset+i/10*2*Math.PI;
-    var end = color_offset+(i+1)/10*2*Math.PI;
-    ctx.beginPath();
-    ctx.arc(600,0,r,start,end);
-    ctx.strokeStyle = color[(color_begin+i)%10];
-    ctx.lineWidth = size;
-    ctx.stroke();
-    ctx.closePath();
+function checkKeyTapNum(){
+  if(keyTapNum>=5){
+    console.log("Gesture: Shaking hands.")
   }
+  timerStarted = false;
+  keyTapNum = 0;
+  console.log("Timer is out.");
+}
+
+function triggerColorPallette(){
   
 }
 
-function expandPenWheel(event){
-  var cX = event.screenX;  
-  var cY = event.screenY;
+function unTriggerColorPallette(){
+  colorPaletteStarted = false;
+  resetColorPallette();
+}
+function resetColorPallette(){
+  
+  var resetColor1,resetColor2,resetColor3;
+  resetColor1 = (curColorGroup==1)?$(".group1").children().eq(0)[0]:(curColorGroup==4)?$(".group4").children().eq(0)[0]:$(".group3").children().eq(0)[0];
+  resetColor1.style.width=200+"px";
+  resetColor1.style.height=200+"px";
+  resetColor1.style.borderTopLeftRadius="0px";
+  resetColor1.style.borderTopRightRadius="0px";
+  resetColor1.style.borderBottomLeftRadius="0px";
+  resetColor1.style.borderBottomRightRadius="200px";
+   
+  resetColor2 = (curColorGroup==1)?$(".group1").children().eq(1)[0]:(curColorGroup==4)?$(".group4").children().eq(1)[0]:$(".group3").children().eq(1)[0];
+  resetColor2.style.width=200+"px";
+  resetColor2.style.height=200+"px";
+  resetColor2.style.borderTopLeftRadius="0px";
+  resetColor2.style.borderTopRightRadius="0px";
+  resetColor2.style.borderBottomLeftRadius="0px";
+  resetColor2.style.borderBottomRightRadius="200px";
+  
+  resetColor3 = (curColorGroup==1)?$(".group1").children().eq(2)[0]:(curColorGroup==4)?$(".group4").children().eq(2)[0]:$(".group3").children().eq(2)[0];
+  resetColor3.style.width=200+"px";
+  resetColor3.style.height=200+"px";
+  resetColor3.style.borderTopLeftRadius="0px";
+  resetColor3.style.borderTopRightRadius="0px";
+  resetColor3.style.borderBottomLeftRadius="0px";
+  resetColor3.style.borderBottomRightRadius="200px";
 
-  if(cX > (w-100) && cY > (h+25)){
-    pen_wheel_expand = true;
-    penWheel(250);
-  }
 }
 
-function hidePenWheel(){
-  pen_wheel_expand = false;
-  penWheel(100);
+function increaseColorGroup(){
+
+  stepAngle = 90;
+  
+    if(curColorGroup==1){
+      //var prev = document.getElementById("colorPaletteSub3").style.zIndex;
+      //document.getElementById("colorPaletteSub3").style.zIndex = document.getElementById("colorPaletteSub4").style.zIndex + 1;
+      //document.getElementById("colorPaletteSub4").style.zIndex = 3;
+      document.getElementById("colorPaletteSub3").style.zIndex = 3;
+      document.getElementById("colorPaletteSub4").style.zIndex = 2;
+      console.log("click-1");
+    }
+    else if(curColorGroup==4){
+      //document.getElementById("colorPaletteSub2").style.zIndex = document.getElementById("colorPaletteSub3").style.zIndex;
+      document.getElementById("colorPaletteSub3").style.zIndex = 2;
+      document.getElementById("colorPaletteSub4").style.zIndex = 3;
+      document.getElementById("colorPaletteSub2").style.zIndex = 3;
+      document.getElementById("colorPaletteSub1").style.zIndex = 3;
+      console.log("click-4");
+    
+    }else if(curColorGroup==3){
+      //document.getElementById("colorPaletteSub1").style.zIndex = document.getElementById("colorPaletteSub2").style.zIndex;
+      document.getElementById("colorPaletteSub2").style.zIndex = 2;
+      //document.getElementById("colorPaletteSub1").style.zIndex = 4;
+      console.log("click-3");
+    }else if(curColorGroup==2){
+      //document.getElementById("colorPaletteSub4").style.zIndex = document.getElementById("colorPaletteSub1").style.zIndex + 1;
+      document.getElementById("colorPaletteSub1").style.zIndex = 2;
+      /*
+      document.getElementById("colorPaletteSub4").style.zIndex = 4;
+      document.getElementById("colorPaletteSub3").style.zIndex = 3;
+      document.getElementById("colorPaletteSub2").style.zIndex = 3;
+      document.getElementById("colorPaletteSub1").style.zIndex = 3;
+      */
+      console.log("click-2");
+    }
+    
+  
+    document.getElementById("colorPaletteSub1").style.webkitTransform="rotate("+(iniColorGroup1+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub1").style.msTransform="rotate("+(iniColorGroup1+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub1").style.mozTransform="rotate("+(iniColorGroup1+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub1").style.oTransform="rotate("+(iniColorGroup1+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub1").style.Transform="rotate("+(iniColorGroup1+stepAngle)+"deg)";
+    iniColorGroup1 += stepAngle;
+        
+    document.getElementById("colorPaletteSub4").style.webkitTransform="rotate("+(iniColorGroup4+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub4").style.msTransform="rotate("+(iniColorGroup4+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub4").style.mozTransform="rotate("+(iniColorGroup4+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub4").style.oTransform="rotate("+(iniColorGroup4+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub4").style.Transform="rotate("+(iniColorGroup4+stepAngle)+"deg)";
+    iniColorGroup4 += stepAngle;
+    
+    document.getElementById("colorPaletteSub3").style.webkitTransform="rotate("+(iniColorGroup3+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub3").style.msTransform="rotate("+(iniColorGroup3+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub3").style.mozTransform="rotate("+(iniColorGroup3+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub3").style.oTransform="rotate("+(iniColorGroup3+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub3").style.Transform="rotate("+(iniColorGroup3+stepAngle)+"deg)";
+    iniColorGroup3 += stepAngle;
+    
+    document.getElementById("colorPaletteSub2").style.webkitTransform="rotate("+(iniColorGroup2+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub2").style.msTransform="rotate("+(iniColorGroup2+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub2").style.mozTransform="rotate("+(iniColorGroup2+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub2").style.oTransform="rotate("+(iniColorGroup2+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub2").style.Transform="rotate("+(iniColorGroup2+stepAngle)+"deg)";
+    iniColorGroup2 += stepAngle;
+    
+    //leftShit();
+    if(curColorGroup==4)
+      curColorGroup = 1;
+    else
+      curColorGroup = curColorGroup+1;
 }
 
-function penWheel(r){
-  var ctx = document.getElementById("penwheel").getContext("2d");
-
-  ctx.clearRect(0,0,600,600);
-  ctx.shadowColor = '#999';
-  ctx.shadowBlur = 50;
-
-  for (var i = 0; i < 10; i++) {
-    var start = pen_offset+i/10*2*Math.PI;
-    var end = pen_offset+(i+1)/10*2*Math.PI;
-    ctx.beginPath();
-    ctx.arc(600,600,r,start,end);
-    ctx.strokeStyle = 'white';
-    ctx.lineCap = 'round';
-    ctx.lineWidth = 1;
-    ctx.lineWidth = pensize[(pen_begin+i)%10];
-    ctx.stroke();
-    ctx.closePath();
-  }
+function decreaseColorGroup(){
+  
+  
+  stepAngle = -90;
+  //if(iniColorGroup1>-180){
+  
+    if(curColorGroup==1){
+      //var prev = document.getElementById("colorPaletteSub3").style.zIndex;
+      //document.getElementById("colorPaletteSub3").style.zIndex = document.getElementById("colorPaletteSub4").style.zIndex + 1;
+      document.getElementById("colorPaletteSub4").style.zIndex = 3;
+      document.getElementById("colorPaletteSub3").style.zIndex = 4;
+      console.log("click-1");
+    }
+    else if(curColorGroup==4){
+      //document.getElementById("colorPaletteSub2").style.zIndex = document.getElementById("colorPaletteSub3").style.zIndex;
+      document.getElementById("colorPaletteSub2").style.zIndex = 4;
+      console.log("click-4");
+    
+    }else if(curColorGroup==3){
+      //document.getElementById("colorPaletteSub1").style.zIndex = document.getElementById("colorPaletteSub2").style.zIndex;
+      document.getElementById("colorPaletteSub1").style.zIndex = 4;
+      console.log("click-3");
+    }else if(curColorGroup==2){
+      //document.getElementById("colorPaletteSub4").style.zIndex = document.getElementById("colorPaletteSub1").style.zIndex + 1;
+      document.getElementById("colorPaletteSub4").style.zIndex = 4;
+      document.getElementById("colorPaletteSub3").style.zIndex = 3;
+      document.getElementById("colorPaletteSub2").style.zIndex = 3;
+      document.getElementById("colorPaletteSub1").style.zIndex = 3;
+      console.log("click-2");
+    }
+    
+    document.getElementById("colorPaletteSub1").style.webkitTransform="rotate("+(iniColorGroup1+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub1").style.msTransform="rotate("+(iniColorGroup1+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub1").style.mozTransform="rotate("+(iniColorGroup1+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub1").style.oTransform="rotate("+(iniColorGroup1+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub1").style.Transform="rotate("+(iniColorGroup1+stepAngle)+"deg)";
+    iniColorGroup1 += stepAngle;
+    
+    document.getElementById("colorPaletteSub4").style.webkitTransform="rotate("+(iniColorGroup4+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub4").style.msTransform="rotate("+(iniColorGroup4+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub4").style.mozTransform="rotate("+(iniColorGroup4+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub4").style.oTransform="rotate("+(iniColorGroup4+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub4").style.Transform="rotate("+(iniColorGroup4+stepAngle)+"deg)";
+    iniColorGroup4 += stepAngle;
+  
+    document.getElementById("colorPaletteSub3").style.webkitTransform="rotate("+(iniColorGroup3+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub3").style.msTransform="rotate("+(iniColorGroup3+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub3").style.mozTransform="rotate("+(iniColorGroup3+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub3").style.oTransform="rotate("+(iniColorGroup3+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub3").style.Transform="rotate("+(iniColorGroup3+stepAngle)+"deg)";
+    iniColorGroup3 += stepAngle;
+    
+    document.getElementById("colorPaletteSub2").style.webkitTransform="rotate("+(iniColorGroup2+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub2").style.msTransform="rotate("+(iniColorGroup2+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub2").style.mozTransform="rotate("+(iniColorGroup2+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub2").style.oTransform="rotate("+(iniColorGroup2+stepAngle)+"deg)";
+    document.getElementById("colorPaletteSub2").style.Transform="rotate("+(iniColorGroup2+stepAngle)+"deg)";
+    iniColorGroup2 += stepAngle;
+    
+    if(curColorGroup==1)
+      curColorGroup = 4;
+    else
+      curColorGroup = curColorGroup-1;
 }
 
+function mouseMove(event,leapX,leapY){
+  
+      var cX,cY;
+      if(event!=null){
+        cX = event.clientX;  
+        cY = event.clientY;
+      }else{
+        cX = leapX;  
+        cY = leapY;
+      }
+      
+      var side = Math.sqrt(cX*cX+cY*cY);
+      var alpha = Math.asin(1.0*cY/side)/Math.PI*180;
+      console.log("alpha = "+alpha);
+      var beta,fillWidth;
+          
+      if(alpha>=0&&alpha<30&&colorPaletteStarted==true){         
+        
+        if(side>300){
+          console.log(globalColor);
+          document.getElementById("realTime").innerText = "Select color: "+globalColor + " Degree is: " + alpha;
+          document.getElementById("colorPalette").style.backgroundColor = globalColor;
+          unTriggerColorPallette();
+        }else{
+          var targetColor;
+          targetColor = (curColorGroup==1)?$(".group1").children().eq(0)[0]:(curColorGroup==4)?$(".group4").children().eq(0)[0]:$(".group3").children().eq(0)[0];
+          targetColor.style.width=100+side+"px";
+          targetColor.style.height=100+side+"px";
+          targetColor.style.borderTopLeftRadius="0px";
+          targetColor.style.borderTopRightRadius="0px";
+          targetColor.style.borderBottomLeftRadius="0px";
+          targetColor.style.borderBottomRightRadius=100+side+"0px";
+  
+          globalColor = window.getComputedStyle(targetColor, null).backgroundColor;
+        }
+        
+      }else if(alpha>=30&&alpha<60&&colorPaletteStarted==true){
+
+        if(side>300){
+          console.log(globalColor);
+          document.getElementById("realTime").innerText = "Select color: "+globalColor + " Degree is: " + alpha;
+          document.getElementById("colorPalette").style.backgroundColor = globalColor;
+          unTriggerColorPallette();
+        }else{
+          var targetColor;
+          targetColor = (curColorGroup==1)?$(".group1").children().eq(1)[0]:(curColorGroup==4)?$(".group4").children().eq(1)[0]:$(".group3").children().eq(1)[0];
+          targetColor.style.width=100+side+"px";
+          targetColor.style.height=100+side+"px";
+          targetColor.style.borderTopLeftRadius="0px";
+          targetColor.style.borderTopRightRadius="0px";
+          targetColor.style.borderBottomLeftRadius="0px";
+          targetColor.style.borderBottomRightRadius=100+side+"0px";
+          globalColor = window.getComputedStyle(targetColor, null).backgroundColor;
+        }
+      
+      }else if(alpha>=60&&alpha<90&&colorPaletteStarted==true){
+
+        if(side>300){
+          console.log(globalColor);
+          document.getElementById("realTime").innerText = "Select color: "+globalColor + " Degree is: " + alpha;
+          document.getElementById("colorPalette").style.backgroundColor = globalColor;
+          unTriggerColorPallette();
+        }else{
+          var targetColor;
+          targetColor = (curColorGroup==1)?$(".group1").children().eq(2)[0]:(curColorGroup==4)?$(".group4").children().eq(2)[0]:$(".group3").children().eq(2)[0];
+          targetColor.style.width=100+side+"px";
+          targetColor.style.height=100+side+"px";
+          targetColor.style.borderTopLeftRadius="0px";
+          targetColor.style.borderTopRightRadius="0px";
+          targetColor.style.borderBottomLeftRadius="0px";
+          targetColor.style.borderBottomRightRadius=100+side+"0px";
+          globalColor = window.getComputedStyle(targetColor, null).backgroundColor;
+        }
+      }else{
+      
+      }
+} 

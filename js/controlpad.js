@@ -9,6 +9,8 @@ $(document).ready(function(){
   var displayArea=canvasElement.getContext("2d");
   $('.trigger').on('dblclick', function(e){
     //console.log("aaaaaaaa");
+    if(!triggerFlag) showHelp();
+    else hideHelp();
     e.preventDefault();
     $.popcircle('#pops2',{
               spacing:'150px',
@@ -174,4 +176,34 @@ function cursor(event, leapCanvasX, leapCanvasY){
   else{
     displayArea.clearRect(0,0,canvasElement.width,canvasElement.height);
   }
+}
+
+function showHelp(){
+  var animate_time = 200;
+  $("#help1").animate({ left:'2%', opacity:'1'},animate_time, function(){
+    $("#help2").animate({ left:'2%', opacity:'1'},animate_time, function(){
+      $("#help3").animate({ left:'2%', opacity:'1'},animate_time);
+    });
+  });
+
+  $("#help4").animate({ right:'2%', opacity:'1'},animate_time, function(){
+    $("#help5").animate({ right:'2%', opacity:'1'},animate_time, function(){
+      $("#help6").animate({ right:'2%', opacity:'1'},animate_time);
+    });
+  });
+}
+
+function hideHelp(){
+  var animate_time = 200;
+  $("#help1").animate({ left:'-30%', opacity:'0'},animate_time, function(){
+    $("#help2").animate({ left:'-30%', opacity:'0'},animate_time, function(){
+      $("#help3").animate({ left:'-30%', opacity:'0'},animate_time);
+    });
+  });
+
+  $("#help4").animate({ right:'-30%', opacity:'0'},animate_time, function(){
+    $("#help5").animate({ right:'-30%', opacity:'0'},animate_time, function(){
+      $("#help6").animate({ right:'-30%', opacity:'0'},animate_time);
+    });
+  });
 }
