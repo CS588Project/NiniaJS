@@ -33,11 +33,11 @@ $(document).ready(function(){
       progress = document.getElementById("progress");
       output.innerHTML = hand.grabStrength.toPrecision(2);
       progress.style.width = hand.grabStrength * 100 + '%';
-      if(hand.grabStrength >= 0.8 && triggerFlag == false){
+      if(hand.grabStrength >= 0.9 && triggerFlag == false){
         $('.trigger').trigger("dblclick");
         //triggerFlag = true;
       }
-      if(hand.grabStrength < 0.8 && triggerFlag == true){
+      if(hand.grabStrength < 0.9 && triggerFlag == true){
         $('.trigger').trigger("dblclick");
         //triggerFlag = false;
       }
