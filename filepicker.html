@@ -15,8 +15,23 @@
 				clientId: '846163745661-05s4im92etrpm3p4f2mjd9entg4vmuoa',
 				buttonEl: document.getElementById('pick'),
 				onSelect: function(file) {
-					console.log(file);
-					alert('Selected ' + file);
+					/*console.log(file);
+					alert('Selected ' + file.exportLinks["application/pdf"]);*/
+					  if (file.exportLinks) {
+					    var accessToken = gapi.auth.getToken().access_token;
+					    var xhr = new XMLHttpRequest();
+					    xhr.open('GET', file.exportLinks["text/plain"]);
+					    xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+					    xhr.onload = function() {
+					      alert(xhr.responseText);
+					    };
+					    xhr.onerror = function() {
+					      alert("error");
+					    };
+					    xhr.send();
+					  } else {
+					    alert("no export url");
+					  }
 				}
 			});	
 		}
