@@ -100,7 +100,7 @@ img#connect-leap{
 
 #help1{
   position: absolute;
-  height: 19%;
+  height: 18%;
   margin: 0px;
   top: 12%;
   opacity: 0;
@@ -109,7 +109,7 @@ img#connect-leap{
 
 #help2{
   position: absolute;
-  height: 19%;
+  height: 18%;
   margin: 0px;
   top: 40%;
   left: -30%;
@@ -118,7 +118,7 @@ img#connect-leap{
 
 #help3{
   position: absolute;
-  height: 19%;
+  height: 18%;
   margin: 0px;
   top: 68%;
   left: -30%;
@@ -127,7 +127,7 @@ img#connect-leap{
 
 #help4{
   position: absolute;
-  height: 19%;
+  height: 18%;
   margin: 0px;
   top: 12%;
   right: -30%;
@@ -136,7 +136,7 @@ img#connect-leap{
 
 #help5{
   position: absolute;
-  height: 19%;
+  height: 18%;
   margin: 0px;
   top: 40%;
   right: -30%;
@@ -145,7 +145,7 @@ img#connect-leap{
 
 #help6{
   position: absolute;
-  height: 19%;
+  height: 18%;
   margin: 0px;
   top: 68%;
   right: -30%;
@@ -176,4 +176,13 @@ body{
        -moz-filter: blur(50px);
         -ms-filter: blur(10px);    
             filter: blur(10px); 
+}
+
+.enableTutorial { 
+  filter: url(blur.svg#blur); /* FireFox, Chrome, Opera */
+  -webkit-transition:-webkit-filter 0.1s ease-in-out;
+  -webkit-filter: blur(2px) brightness(60%); /* Chrome, Opera */
+       -moz-filter: blur(2px);
+        -ms-filter: blur(2px);    
+            filter: blur(2px); 
 }

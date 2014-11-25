@@ -13,6 +13,7 @@
   <script src="js/controlpad.js"></script>
 
   <script src="js/canvas.js"></script>
+  <script src="js/tutorial.js"></script>
   <link rel="stylesheet" type="text/css" href="css/canvas.css">
   <link rel="stylesheet" type="text/css" href="css/ColorPalette.css" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -24,7 +25,7 @@
   <p id="demo4" class="blur" ><font color="red"></font></p>
   <!-- canvas -->
   <div class="blur">
-  <canvas id="myCanvas" style="height:100%; width:100%;z-index:0"></canvas> 
+  <canvas id="myCanvas" style="height:100%; width:100%; z-index:0"></canvas> 
 
   <div class="menuHolder" style="position:absolute;"> 
     <div id="colorPalette" style="z-index:10">Color Palette         
@@ -100,6 +101,7 @@
       </ul>
     </div>
   </div>
+  <img id="tutorial_img" style=" opacity:0; position: absolute; top:0; left: 0; height:100%; width:100%; z-index:0;" onclick="nextTutorial()" />
   <img id='help1' src="img/gesture/h_canvas_pokein.png"/>
   <img id='help2' src="img/gesture/h_canvas_movefinger.png"/>
   <img id='help3' src="img/gesture/h_canvas_movestop.png"/>
