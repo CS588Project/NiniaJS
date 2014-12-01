@@ -25,26 +25,34 @@
   <p id="demo4" class="blur" ><font color="red"></font></p>
   <!-- canvas -->
   <div class="blur">
+  
   <canvas id="myCanvas" style="height:100%; width:100%; z-index:0"></canvas> 
 
+    <!------------------------------------ Real Time Output for debug use ------------------------------------------------>
+  <p style="position:absolute;left:1000px;top:525px;color:red">HandType: <span id="handType"></span></p>
+  <p style="position:absolute;left:1000px;top:550px;color:red">Distance: <span id="distance"></span></p>
+  <p style="position:absolute;left:1000px;top:600px;color:red">CursorXY: <span id="cursorXY"></span></p>
+  <p id="realTime" style="opacity:1.0;position:absolute;top:575px;left:1000px;color:red">Real-time Output: </p>
+  <!------------------------------------ Real Time Output for debug use ------------------------------------------------>
+    
   <div class="menuHolder" style="position:absolute;"> 
     <div id="colorPalette" style="z-index:10">Color Palette         
     </div> 
     
     <div class = "group3" id="colorPaletteSub3" style="z-index:3">
-      <div  onmousemove="mouseMove(event)">Red</div>
+      <div  onmousemove="mouseMove(event)">Green</div>
       <div  onmousemove="mouseMove(event)">Purple</div>
-      <div  onmousemove="mouseMove(event)">Pink</div>
+      <div  onmousemove="mouseMove(event)">Black</div>
     </div>
     
     <div class = "group2" id="colorPaletteSub2" style="z-index:3">
-      <div style="z-index:3" onmousemove="mouseMove(event)">Red</div>
-      <div style="z-index:3" onmousemove="mouseMove(event)">Purple</div>
-      <div style="z-index:3" onmousemove="mouseMove(event)">Pink</div>
+      <div style="z-index:3" onmousemove="mouseMove(event)">Magenta</div>
+      <div style="z-index:3" onmousemove="mouseMove(event)">Maroon</div>
+      <div style="z-index:3" onmousemove="mouseMove(event)">Gold</div>
     </div>
     
     <div class = "group1" id="colorPaletteSub1" style="z-index:3">
-      <div onmousemove="mouseMove(event)">Red</div>
+      <div onmousemove="mouseMove(event)">Brown</div>
       <div onmousemove="mouseMove(event)">Purple</div>
       <div onmousemove="mouseMove(event)">Pink</div>
     </div>
@@ -53,21 +61,71 @@
         <div style="z-index:3"  onmousemove="mouseMove(event)">Red</div>
         <div style="z-index:3"  onmousemove="mouseMove(event)">Blue</div>
     </div>
+  
+  <!---------------------------------------Right Hand Color Palette ------------------------------------->
+  <div class="menuHolderRight"> 
+    <div id="colorPaletteRight" style="z-index:10">Color Palette          
+    </div> 
+      
+    <div class = "group1Right" id="colorPaletteSub1Right" style="z-index:3">
+      <div onmousemove="mouseMove(event)">Brown</div>
+      <div onmousemove="mouseMove(event)">Purple</div>
+      <div onmousemove="mouseMove(event)">Pink</div>
+    </div>
+  </div> 
+  <!---------------------------------------Right Hand Color Palette ------------------------------------->
+    
   </div> 
   
 
   <div class="collision" id="leapCursor" style="z-index:15;opacity:1.0;position:absolute;width=100;height=100">Erase Cursor</div>
-  <p>Distance: <span id="distance"></span></p>
-  <button type="button" onclick="triggerColorPallette()" style="position:absolute; left: 400px; top: 300px">Open Color Pallette!</button>
-  <button type="button" onclick="decreaseColorGroup()" style="position:absolute; left: 600px; top: 300px">Decrease Color Group</button>
-  <button type="button" onclick="increaseColorGroup()" style="position:absolute; left: 600px; top: 200px">Increase Color Group</button>
-  <p id="realTime" style="z-index:5;opacity:1.0;position:absolute;top:400px; left:400px">Real-time Output: </p>
+  
+  <!-------------------------------------------------Button for debug use -------------------------------------------------------->
+  <button type="button" onclick="decreaseColorGroup()" style="position:absolute; left: 300px; top: 500px">Decrease Color Group</button>
+  <button type="button" onclick="increaseColorGroup()" style="position:absolute; left: 300px; top: 550px">Increase Color Group</button>
+  <button type="button" onclick="openBrushTypeL2()" style="position:absolute; left: 500px; top: 450px">Open BrushType Level2</button>
+  <button type="button" onclick="closeBrushTypeL2()" style="position:absolute; left: 500px; top: 500px">Close BrushType Level2</button>
+  <button type="button" onclick="openBrushThicknessL2()" style="position:absolute; left: 500px; top: 550px">Open BrushThickness Level2</button>
+  <button type="button" onclick="closeBrushThicknessL2()" style="position:absolute; left: 500px; top: 600px">Close BrushThickness Level2</button>
+  <button type="button" onclick="clearDrawingCanvas()" style="position:absolute; left: 300px; top: 600px">Clear drawing canvas!</button>
+  <!-------------------------------------------------Button for debug use -------------------------------------------------------->
+    
+
+    <div id="brushTypeHover" style="position:absolute;padding:0px;left:0px;top:333px;width:100px;height:150px; opacity:0.5;background-color:gray;z-index:9;font-weight:bold;color:white" >
+    Choose Your Brush Type
+  </div>    
+  <div id="brushType" style="position:absolute;padding:0px;left:0px;top:333px;width:100px;height:150px; opacity:1.0;background-color:gray;z-index:10" >
+    <img src="img/brushICON.png"/>
+  </div>
+
+  <div id="brushThicknessHover" style="position:absolute;padding:0px;left:0px;top:483px;width:100px;height:150px; opacity:0.5; background-color:gray;z-index:9;font-weight:bold;color:white">
+    Choose Your Brush Thickness
+  </div>
+  <div id="brushThickness" style="position:absolute;padding:0px;left:0px;top:483px;width:100px;height:150px; opacity:1.0; background-color:gray;z-index:10;">
+    <img src="img/brushTHICKNESS.png"/>
+  </div>
+  
+    <div id="crayon1" class="brushTypeL2" style="position:absolute;left:100px;top:333px;height:100px; opacity:1.0; background-color:gray;z-index:10" ></div>
+  <div id="crayon2" class="brushTypeL2" style="position:absolute;left:100px;top:433px;height:100px; opacity:1.0; background-color:gray;z-index:10" ></div>
+  <div id="crayon3" class="brushTypeL2" style="position:absolute;left:100px;top:533px;height:100px; opacity:1.0; background-color:gray;z-index:10" ></div>
+
+  <div id="small" class="brushThicknessL2" style="position:absolute;left:100px;top: 333px;  height:100px; opacity:1.0; background-color:gray;z-index:10;background-image:url('img/small.png');"  ></div>
+  <div id="medium" class="brushThicknessL2" style="position:absolute;left:100px;top: 433px; height:100px; opacity:1.0; background-color:gray;z-index:10;background-image:url('img/medium.png');" ></div>
+  <div id="large" class="brushThicknessL2" style="position:absolute;left:100px;top: 533px;  height:100px; opacity:1.0; background-color:gray;z-index:10;background-image:url('img/large.png');" ></div>
+
+  <img src="img/crayonRed.jpg" id="crayonRed" style = " visiblity: visible"/>
+  <img src="img/crayonBlue.jpg" id="crayonBlue" style = " visiblity: visible"/>
+  <img src="img/crayonYellow.jpg" id="crayonYellow" style = " visiblity: visible"/>
+
+  
+  <div id="brushChoice" style="position:absolute;left:200px;height:100px;background-color:rgb(167,71,8);z-index:10" ></div>
+  <div id="brushClip" style="position:absolute;left:100px;height:100px;z-index:11" ></div>
   </div>
   <!-- control pad -->
   <div id="output" class="blur" ></div>
   <div id="progress" class="blur" ></div>
   <div class="box" onmousemove="centralPad(event, 0, 0)">
-    <div class="trigger" id="circle_btn2"><canvas id="myCanvas" width="400px" height="400px" style="left:0px;top:0px;border:1px"></canvas></div>
+    <div class="trigger" id="circle_btn2"><canvas id="control_canvas" width="400px" height="400px" style="left:0px;top:0px;border:1px"></canvas></div>
     <div class="popcircle">
       <ul id="pops2">
         <li>

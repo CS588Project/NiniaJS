@@ -5,7 +5,7 @@ var menuClickFlag;
 $(document).ready(function(){
   triggerFlag = false;
   $(".blur").addClass("disableBlur");
-  var canvasElement=document.getElementById("myCanvas");
+  var canvasElement=document.getElementById("control_canvas");
   var displayArea=canvasElement.getContext("2d");
   $('.trigger').on('dblclick', function(e){
     //console.log("aaaaaaaa");
@@ -160,7 +160,7 @@ function cursor(event, leapCanvasX, leapCanvasY){
     var offsety = leapCanvasY-200;
   }
 
-  var canvasElement=document.getElementById("myCanvas");
+  var canvasElement=document.getElementById("control_canvas");
   var displayArea=canvasElement.getContext("2d");  //cursor
   if(triggerFlag){
     displayArea.beginPath();
