@@ -1,167 +1,158 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Ninia - Video</title>
-    <script src="js/three.min.js"></script>  
-    <script src="js/jquery.min.js"></script>
-    <script src="js/jquery.easing.1.3.js"></script>
-    <script src="js/jquery.popcircle.1.0.js"></script>
-    <script src="js/leap-0.6.2.min.js"></script>
-    <script src="js/leap-plugins-0.1.6.1.min.js"></script>
-    <script src="js/leap.rigged-hand-0.1.4.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="css/controlpad.css">
-    <script src="js/tutorial.js"></script>
-    <script src="js/controlpad.js"></script>  
-    <script language="JavaScript" type="text/javascript" src="ContentFlow/contentflow.js"></script>
-
-  <!--for poping up video-->
-  <link rel="stylesheet" href="css/colorbox.css" />
-  <script src="js/jquery.colorbox.js"></script>
-
+<title>Ninia - Video</title>
+<script src="js/three.min.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/jquery.easing.1.3.js"></script>
+<script src="js/jquery.popcircle.1.0.js"></script>
+<script src="js/leap-0.6.2.min.js"></script>
+<script src="js/leap-plugins-0.1.6.1.min.js"></script>
+<script src="js/leap.rigged-hand-0.1.4.min.js"></script>
+<link rel="stylesheet" type="text/css" href="css/controlpad.css">
+<script src="js/tutorial.js"></script>
+<script src="js/controlpad.js"></script>
+<script language="JavaScript" type="text/javascript" src="ContentFlow/contentflow.js"></script>
+<!--for poping up video-->
+<link rel="stylesheet" href="css/colorbox.css" />
+<script src="js/jquery.colorbox.js"></script>
 </head>
-<body background="img/ninia.jpg" style="overflow: hidden">
+<body background="img/bg_black.jpg" style="overflow: hidden">
 <p id="demo" class="blur" ><font color="red"></font></p>
 <p id="demo2" class="blur" ><font color="red"></font></p>
 <p id="demo3" class="blur" ><font color="red"></font></p>
 <p id="demo4" class="blur" ><font color="red"></font></p>
-
 <!--Content Flow-->
 <br><br><br><br><br><br>
 <div class="blur">
-  <div id="theflow" class="ContentFlow">
-      <div class="flow" id="anchorToAddImage">
-          <!--
-          <div class="item">
-              <img class="content"> </img>
-          </div>
-          <div class="item">
-              <img class="content"> </img>
-          </div>
-          <div class="item">
-              <img class="content"> </img>
-          </div>
-          <div class="item">
-              <img class="content"> </img>
-          </div>
-          -->
-      </div>
-
-      <div class="loadIndicator"></div>
-      <div id="popup"></div>
-  </div>
+<div id="theflow" class="ContentFlow">
+<div class="flow" id="anchorToAddImage">
+<!--
+<div class="item">
+<img class="content"> </img>
 </div>
-
+<div class="item">
+<img class="content"> </img>
+</div>
+<div class="item">
+<img class="content"> </img>
+</div>
+<div class="item">
+<img class="content"> </img>
+</div>
+-->
+</div>
+<div class="loadIndicator"></div>
+<div id="popup"></div>
+</div>
+</div>
 <script type="text/javascript">
-    function loadConfiguration(){
-      var xmlhttp;
-      if(window.XMLHttpRequest){// code for IE7+, Firefox, Chrome, Opera, Safari
-        xmlhttp = new XMLHttpRequest();
-      }
-      else{// code for IE6, IE5
-        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-      }
-      xmlhttp.onreadystatechange = function(){
-        if(xmlhttp.readyState == 4 && xmlhttp.status == 200){
-          var id = JSON.parse(xmlhttp.responseText);
-          for(var i = 0; i < id.ids.length; i++){
-            videoIds.push(id.ids[i]);
-          }
-          var anchor = document.getElementById("anchorToAddImage");
-          for(var i = 0; i < videoIds.length; i++){
-            var innerDiv = document.createElement('div');
-            innerDiv.className = "item";
-            var innerImg = document.createElement('img');
-            innerImg.className = "content";
-            innerImg.src = "http://img.youtube.com/vi/" + videoIds[i] + "/0.jpg";
-            innerDiv.appendChild(innerImg);
-            anchor.appendChild(innerDiv);
-          }
-        }
-      }
-      xmlhttp.open("GET","videos.json",true);
-      xmlhttp.send();
-    }
-    var popingup = false;
-    var w = window.innerWidth;
-    var h = window.innerHeight;
-    var videoIds = [];
-    $(document).ready(function(){
-        myNewFlow = new ContentFlow('theflow', {endOpacity:0.5, visibleItems:4, relativeItemPosition:'center top', maxItemHeight:0.5*h, flowSpeedFactor:0.5});
-        
-        loadConfiguration();
-        /*var anchor = document.getElementById("anchorToAddImage");
-        for(var i = 0; i < videoIds.length; i++){
-            var innerDiv = document.createElement('div');
-            innerDiv.className = "item";
-            var innerImg = document.createElement('img');
-            innerImg.className = "content";
-            innerImg.src = "http://img.youtube.com/vi/" + videoIds[i] + "/0.jpg";
-            innerDiv.appendChild(innerImg);
-            anchor.appendChild(innerDiv);
-        }*/
-        /*var items = document.getElementById("anchorToAddImage").getElementsByTagName("div");
-        for(var i = 0; i < items.length; i++){
-            items[i].getElementsByTagName("img")[0].src = "http://img.youtube.com/vi/" + videoIds[i] + "/0.jpg";
-        }*/
-
-        $(document).keydown(function(e){
-            if(e.which == 88){
-                alert(myNewFlow.getActiveItem()["index"]);
-            }
-        });
-
-        $(document).keydown(function(e){
-            if(e.which == 90){
-                if(popingup == false){
-                    var url = "youtube.html?id=" + videoIds[myNewFlow.getActiveItem()["index"]];
-                    $.colorbox({iframe:true, id:"popup", href:url, innerWidth: w * 0.9, innerHeight: h * 0.85, onComplete:function(){document.getElementById("cboxLoadedContent").getElementsByTagName("iframe")[0].focus();}});
-                    popingup = true;
-                }else{
-                    $.colorbox.close();
-                    popingup = false;
-                }
-            }
-        });
-    });
+function loadConfiguration(){
+var xmlhttp;
+if(window.XMLHttpRequest){// code for IE7+, Firefox, Chrome, Opera, Safari
+xmlhttp = new XMLHttpRequest();
+}
+else{// code for IE6, IE5
+xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+}
+xmlhttp.onreadystatechange = function(){
+if(xmlhttp.readyState == 4 && xmlhttp.status == 200){
+var id = JSON.parse(xmlhttp.responseText);
+for(var i = 0; i < id.ids.length; i++){
+videoIds.push(id.ids[i]);
+}
+var anchor = document.getElementById("anchorToAddImage");
+for(var i = 0; i < videoIds.length; i++){
+var innerDiv = document.createElement('div');
+innerDiv.className = "item";
+var innerImg = document.createElement('img');
+innerImg.className = "content";
+innerImg.src = "http://img.youtube.com/vi/" + videoIds[i] + "/0.jpg";
+innerDiv.appendChild(innerImg);
+anchor.appendChild(innerDiv);
+}
+}
+}
+xmlhttp.open("GET","videos.json",true);
+xmlhttp.send();
+}
+var popingup = false;
+var w = window.innerWidth;
+var h = window.innerHeight;
+var videoIds = [];
+$(document).ready(function(){
+myNewFlow = new ContentFlow('theflow', {endOpacity:0.5, visibleItems:4, relativeItemPosition:'center top', maxItemHeight:0.5*h, flowSpeedFactor:0.5});
+loadConfiguration();
+/*var anchor = document.getElementById("anchorToAddImage");
+for(var i = 0; i < videoIds.length; i++){
+var innerDiv = document.createElement('div');
+innerDiv.className = "item";
+var innerImg = document.createElement('img');
+innerImg.className = "content";
+innerImg.src = "http://img.youtube.com/vi/" + videoIds[i] + "/0.jpg";
+innerDiv.appendChild(innerImg);
+anchor.appendChild(innerDiv);
+}*/
+/*var items = document.getElementById("anchorToAddImage").getElementsByTagName("div");
+for(var i = 0; i < items.length; i++){
+items[i].getElementsByTagName("img")[0].src = "http://img.youtube.com/vi/" + videoIds[i] + "/0.jpg";
+}*/
+$(document).keydown(function(e){
+if(e.which == 88){
+alert(myNewFlow.getActiveItem()["index"]);
+}
+});
+$(document).keydown(function(e){
+if(e.which == 90){
+if(popingup == false){
+var url = "youtube.html?id=" + videoIds[myNewFlow.getActiveItem()["index"]];
+$.colorbox({iframe:true, id:"popup", href:url, innerWidth: w * 0.9, innerHeight: h * 0.85, onComplete:function(){document.getElementById("cboxLoadedContent").getElementsByTagName("iframe")[0].focus();}});
+popingup = true;
+}else{
+$.colorbox.close();
+popingup = false;
+}
+}
+});
+});
 </script>
-
 <!-- control pad -->
 <div id="output" class="blur" ></div>
 <div id="progress" class="blur" ></div>
 <div class="box" onmousemove="centralPad(event, 0, 0)">
-  <div class="trigger" id="circle_btn2"><canvas id="control_canvas" width="400px" height="400px" style="left:0px;top:0px;border:1px"></canvas></div>
-  <div class="popcircle">
-    <ul id="pops2">
-      <li>
-        <a href="">
-          <img src="img/right_icon.png" class="righticon">
-          <img id="rmsk" src="img/right_mask.png" class="righticon">
-          <img src="img/video_icon.png" class="righticon"><br>
-        </a>
-      </li>
-      <li>
-        <a href="">
-          <img src="img/down_icon.png" class="downicon">
-          <img id = "dmsk" src="img/down_mask.png" class="downicon">
-          <img src="img/canvas_icon.png" class="downicon"><br>
-        </a>
-      </li>
-      <li>
-        <a href="">
-          <img src="img/left_icon.png" class="lefticon">
-          <img id="lmsk" src="img/left_mask.png" class="lefticon">
-          <img src="img/slide_icon.png" class="lefticon">
-        </a>
-      </li>
-      <li>
-        <a href="">
-          <img src="img/up_icon.png" class="upicon">
-          <img id="umsk"src="img/up_mask.png" class="upicon">
-          <img src="img/gallery_icon.png" class="upicon"><br>
-        </a>
-      </li>
-    </ul>
-  </div>
+<div class="trigger" id="circle_btn2"><canvas id="control_canvas" width="400px" height="400px" style="left:0px;top:0px;border:1px"></canvas></div>
+<div class="popcircle">
+<ul id="pops2">
+<li>
+<a href="">
+<img src="img/right_icon.png" class="righticon">
+<img id="rmsk" src="img/right_mask.png" class="righticon">
+<img src="img/video_icon.png" class="righticon"><br>
+</a>
+</li>
+<li>
+<a href="">
+<img src="img/down_icon.png" class="downicon">
+<img id = "dmsk" src="img/down_mask.png" class="downicon">
+<img src="img/canvas_icon.png" class="downicon"><br>
+</a>
+</li>
+<li>
+<a href="">
+<img src="img/left_icon.png" class="lefticon">
+<img id="lmsk" src="img/left_mask.png" class="lefticon">
+<img src="img/slide_icon.png" class="lefticon">
+</a>
+</li>
+<li>
+<a href="">
+<img src="img/up_icon.png" class="upicon">
+<img id="umsk"src="img/up_mask.png" class="upicon">
+<img src="img/gallery_icon.png" class="upicon"><br>
+</a>
+</li>
+</ul>
+</div>
 </div>
 <img id="tutorial_img" style=" opacity:0; position: absolute; top:0; left: 0; height:100%; width:100%; z-index:0;" onclick="nextTutorial()" />
 <img id='help1' src="img/gesture/h_video_wave.png"/>
