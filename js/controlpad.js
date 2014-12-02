@@ -5,10 +5,12 @@ var menuClickFlag;
 $(document).ready(function(){
   triggerFlag = false;
   $(".blur").addClass("disableBlur");
-  var canvasElement=document.getElementById("myCanvas");
+  var canvasElement=document.getElementById("control_canvas");
   var displayArea=canvasElement.getContext("2d");
   $('.trigger').on('dblclick', function(e){
     //console.log("aaaaaaaa");
+    if(!triggerFlag) showHelp();
+    else hideHelp();
     e.preventDefault();
     $.popcircle('#pops2',{
               spacing:'150px',
@@ -31,11 +33,11 @@ $(document).ready(function(){
       progress = document.getElementById("progress");
       output.innerHTML = hand.grabStrength.toPrecision(2);
       progress.style.width = hand.grabStrength * 100 + '%';
-      if(hand.grabStrength >= 0.8 && triggerFlag == false){
+      if(hand.grabStrength >= 0.9 && triggerFlag == false){
         $('.trigger').trigger("dblclick");
         //triggerFlag = true;
       }
-      if(hand.grabStrength < 0.8 && triggerFlag == true){
+      if(hand.grabStrength < 0.9 && triggerFlag == true){
         $('.trigger').trigger("dblclick");
         //triggerFlag = false;
       }
@@ -158,7 +160,7 @@ function cursor(event, leapCanvasX, leapCanvasY){
     var offsety = leapCanvasY-200;
   }
 
-  var canvasElement=document.getElementById("myCanvas");
+  var canvasElement=document.getElementById("control_canvas");
   var displayArea=canvasElement.getContext("2d");  //cursor
   if(triggerFlag){
     displayArea.beginPath();
@@ -174,4 +176,34 @@ function cursor(event, leapCanvasX, leapCanvasY){
   else{
     displayArea.clearRect(0,0,canvasElement.width,canvasElement.height);
   }
+}
+
+function showHelp(){
+  var animate_time = 200;
+  $("#help1").animate({ left:'2%', opacity:'1'},animate_time, function(){
+    $("#help2").animate({ left:'2%', opacity:'1'},animate_time, function(){
+      $("#help3").animate({ left:'2%', opacity:'1'},animate_time);
+    });
+  });
+
+  $("#help4").animate({ right:'2%', opacity:'1'},animate_time, function(){
+    $("#help5").animate({ right:'2%', opacity:'1'},animate_time, function(){
+      $("#help6").animate({ right:'2%', opacity:'1'},animate_time);
+    });
+  });
+}
+
+function hideHelp(){
+  var animate_time = 200;
+  $("#help1").animate({ left:'-30%', opacity:'0'},animate_time, function(){
+    $("#help2").animate({ left:'-30%', opacity:'0'},animate_time, function(){
+      $("#help3").animate({ left:'-30%', opacity:'0'},animate_time);
+    });
+  });
+
+  $("#help4").animate({ right:'-30%', opacity:'0'},animate_time, function(){
+    $("#help5").animate({ right:'-30%', opacity:'0'},animate_time, function(){
+      $("#help6").animate({ right:'-30%', opacity:'0'},animate_time);
+    });
+  });
 }

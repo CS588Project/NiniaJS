@@ -1,88 +1,170 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Ninia - Canvas</title>
-    <script src="js/three.min.js"></script>  
-    <script src="js/jquery.min.js"></script>
-    <script src="js/jquery.easing.1.3.js"></script>
-    <script src="js/jquery.popcircle.1.0.js"></script>
-    <script src="js/leap-0.6.2.min.js"></script>
-    <script src="js/leap-plugins-0.1.6.1.min.js"></script>
-    <script src="js/leap.rigged-hand-0.1.4.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="css/controlpad.css">
-    <script src="js/controlpad.js"></script>
-    <script src="js/canvas.js"></script>
-    <link rel="stylesheet" type="text/css" href="css/canvas.css">
-    <script src="js/controlpad.js"></script> 
-    <link rel="stylesheet" type="text/css" href="css/controlpad.css">
-  </head>
-  <body background="img/bg_black.jpg"  onload = "initialization()" onresize="initialization()" style="overflow: hidden"> 
+<head>
+  <title>Ninia - Canvas</title>
+  <script src="js/three.min.js"></script>  
+  <script src="js/jquery.min.js"></script>
+  <script src="js/jquery.easing.1.3.js"></script>
+  <script src="js/jquery.popcircle.1.0.js"></script>
+  <script src="js/leap-0.6.2.min.js"></script>
+  <script src="js/leap-plugins-0.1.6.1.min.js"></script>
+  <script src="js/leap.rigged-hand-0.1.4.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/controlpad.css">
+  <script src="js/controlpad.js"></script>
 
+  <script src="js/canvas.js"></script>
+  <script src="js/tutorial.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/canvas.css">
+  <link rel="stylesheet" type="text/css" href="css/ColorPalette.css" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body bgcolor="black" style="height:100%; width:100% overflow:hidden">
   <p id="demo" class="blur" ><font color="red"></font></p>
   <p id="demo2" class="blur" ><font color="red"></font></p>
   <p id="demo3" class="blur" ><font color="red"></font></p>
   <p id="demo4" class="blur" ><font color="red"></font></p>
-  <!-- Canvas -->
+  <!-- canvas -->
   <div class="blur">
-    <p id="msg">cursor position</p>
-    <p id="seletedcolor" > <font color="white">0</font></p>
-    <p id="seletedpensize" > <font color="white">1</font></p>
+  
+  <canvas id="myCanvas" style="height:100%; width:100%; z-index:0"></canvas> 
 
+    <!------------------------------------ Real Time Output for debug use ------------------------------------------------>
+  <p style="position:absolute;left:1000px;top:525px;color:red">HandType: <span id="handType"></span></p>
+  <p style="position:absolute;left:1000px;top:550px;color:red">Distance: <span id="distance"></span></p>
+  <p style="position:absolute;left:1000px;top:600px;color:red">CursorXY: <span id="cursorXY"></span></p>
+  <p id="realTime" style="opacity:1.0;position:absolute;top:575px;left:1000px;color:red">Real-time Output: </p>
+  <!------------------------------------ Real Time Output for debug use ------------------------------------------------>
+    
+  <div class="menuHolder" style="position:absolute;"> 
+    <div id="colorPalette" style="z-index:10">Color Palette         
+    </div> 
+    
+    <div class = "group3" id="colorPaletteSub3" style="z-index:3">
+      <div  onmousemove="mouseMove(event)">Green</div>
+      <div  onmousemove="mouseMove(event)">Purple</div>
+      <div  onmousemove="mouseMove(event)">Black</div>
+    </div>
+    
+    <div class = "group2" id="colorPaletteSub2" style="z-index:3">
+      <div style="z-index:3" onmousemove="mouseMove(event)">Magenta</div>
+      <div style="z-index:3" onmousemove="mouseMove(event)">Maroon</div>
+      <div style="z-index:3" onmousemove="mouseMove(event)">Gold</div>
+    </div>
+    
+    <div class = "group1" id="colorPaletteSub1" style="z-index:3">
+      <div onmousemove="mouseMove(event)">Brown</div>
+      <div onmousemove="mouseMove(event)">Purple</div>
+      <div onmousemove="mouseMove(event)">Pink</div>
+    </div>
+    <div class = "group4" id="colorPaletteSub4" style="z-index:3" > 
+        <div style="z-index:3"  onmousemove="mouseMove(event)">Yellow</div>
+        <div style="z-index:3"  onmousemove="mouseMove(event)">Red</div>
+        <div style="z-index:3"  onmousemove="mouseMove(event)">Blue</div>
+    </div>
+  
+  <!---------------------------------------Right Hand Color Palette ------------------------------------->
+  <div class="menuHolderRight"> 
+    <div id="colorPaletteRight" style="z-index:10">Color Palette          
+    </div> 
+      
+    <div class = "group1Right" id="colorPaletteSub1Right" style="z-index:3">
+      <div onmousemove="mouseMove(event)">Brown</div>
+      <div onmousemove="mouseMove(event)">Purple</div>
+      <div onmousemove="mouseMove(event)">Pink</div>
+    </div>
+  </div> 
+  <!---------------------------------------Right Hand Color Palette ------------------------------------->
+    
+  </div> 
+  
 
-    <canvas id="colorwheel" width="600" height="600" onmousemove="expandColorWheel(event)" onmouseout="hideColorWheel()" >
-      color wheel.
-    </canvas>
+  <div class="collision" id="leapCursor" style="z-index:15;opacity:1.0;position:absolute;width=100;height=100">Erase Cursor</div>
+  
+  <!-------------------------------------------------Button for debug use -------------------------------------------------------->
+  <button type="button" onclick="decreaseColorGroup()" style="position:absolute; left: 300px; top: 500px">Decrease Color Group</button>
+  <button type="button" onclick="increaseColorGroup()" style="position:absolute; left: 300px; top: 550px">Increase Color Group</button>
+  <button type="button" onclick="openBrushTypeL2()" style="position:absolute; left: 500px; top: 450px">Open BrushType Level2</button>
+  <button type="button" onclick="closeBrushTypeL2()" style="position:absolute; left: 500px; top: 500px">Close BrushType Level2</button>
+  <button type="button" onclick="openBrushThicknessL2()" style="position:absolute; left: 500px; top: 550px">Open BrushThickness Level2</button>
+  <button type="button" onclick="closeBrushThicknessL2()" style="position:absolute; left: 500px; top: 600px">Close BrushThickness Level2</button>
+  <button type="button" onclick="clearDrawingCanvas()" style="position:absolute; left: 300px; top: 600px">Clear drawing canvas!</button>
+  <!-------------------------------------------------Button for debug use -------------------------------------------------------->
+    
 
-    <canvas id="penwheel" width="600" height="600" onmousemove="expandPenWheel(event)" onmouseout="hidePenWheel()" >
-      pen wheel.
-    </canvas>
-
-    <canvas id="maincanvas" onclick="switchdraw()" onmousemove="draw(event)" ondblclick="eraser()"> 
-      Your browser does not support the canvas.
-    </canvas>
-
-    <canvas id="cursor" onclick="switchdraw()" onmousemove="draw(event)" ondblclick="eraser()"> 
-      This is cursor.
-    </canvas>
+    <div id="brushTypeHover" style="position:absolute;padding:0px;left:0px;top:333px;width:100px;height:150px; opacity:0.5;background-color:gray;z-index:9;font-weight:bold;color:white" >
+    Choose Your Brush Type
+  </div>    
+  <div id="brushType" style="position:absolute;padding:0px;left:0px;top:333px;width:100px;height:150px; opacity:1.0;background-color:gray;z-index:10" >
+    <img src="img/brushICON.png"/>
   </div>
 
-    <!-- control pad -->
-    <div id="output" class="blur" ></div>
-    <div id="progress" class="blur" ></div>
-    <div class="box" onmousemove="centralPad(event, 0, 0)">
-      <div class="trigger" id="circle_btn2"><canvas id="myCanvas" width="400px" height="400px" style="left:0px;top:0px;border:1px"></canvas></div>
-      <div class="popcircle">
-        <ul id="pops2">
-          <li>
-            <a href="">
-              <img src="img/right_icon.png" class="righticon">
-              <img id="rmsk" src="img/right_mask.png" class="righticon">
-              <img src="img/video_icon.png" class="righticon"><br>
-            </a>
-          </li>
-          <li>
-            <a href="">
-              <img src="img/down_icon.png" class="downicon">
-              <img id = "dmsk" src="img/down_mask.png" class="downicon">
-              <img src="img/canvas_icon.png" class="downicon"><br>
-            </a>
-          </li>
-          <li>
-            <a href="">
-              <img src="img/left_icon.png" class="lefticon">
-              <img id="lmsk" src="img/left_mask.png" class="lefticon">
-              <img src="img/slide_icon.png" class="lefticon">
-            </a>
-          </li>
-          <li>
-            <a href="">
-              <img src="img/up_icon.png" class="upicon">
-              <img id="umsk"src="img/up_mask.png" class="upicon">
-              <img src="img/gallery_icon.png" class="upicon"><br>
-            </a>
-          </li>
-        </ul>
-      </div>
+  <div id="brushThicknessHover" style="position:absolute;padding:0px;left:0px;top:483px;width:100px;height:150px; opacity:0.5; background-color:gray;z-index:9;font-weight:bold;color:white">
+    Choose Your Brush Thickness
+  </div>
+  <div id="brushThickness" style="position:absolute;padding:0px;left:0px;top:483px;width:100px;height:150px; opacity:1.0; background-color:gray;z-index:10;">
+    <img src="img/brushTHICKNESS.png"/>
+  </div>
+  
+    <div id="crayon1" class="brushTypeL2" style="position:absolute;left:100px;top:333px;height:100px; opacity:1.0; background-color:gray;z-index:10" ></div>
+  <div id="crayon2" class="brushTypeL2" style="position:absolute;left:100px;top:433px;height:100px; opacity:1.0; background-color:gray;z-index:10" ></div>
+  <div id="crayon3" class="brushTypeL2" style="position:absolute;left:100px;top:533px;height:100px; opacity:1.0; background-color:gray;z-index:10" ></div>
+
+  <div id="small" class="brushThicknessL2" style="position:absolute;left:100px;top: 333px;  height:100px; opacity:1.0; background-color:gray;z-index:10;background-image:url('img/small.png');"  ></div>
+  <div id="medium" class="brushThicknessL2" style="position:absolute;left:100px;top: 433px; height:100px; opacity:1.0; background-color:gray;z-index:10;background-image:url('img/medium.png');" ></div>
+  <div id="large" class="brushThicknessL2" style="position:absolute;left:100px;top: 533px;  height:100px; opacity:1.0; background-color:gray;z-index:10;background-image:url('img/large.png');" ></div>
+
+  <img src="img/crayonRed.jpg" id="crayonRed" style = " visiblity: visible"/>
+  <img src="img/crayonBlue.jpg" id="crayonBlue" style = " visiblity: visible"/>
+  <img src="img/crayonYellow.jpg" id="crayonYellow" style = " visiblity: visible"/>
+
+  
+  <div id="brushChoice" style="position:absolute;left:200px;height:100px;background-color:rgb(167,71,8);z-index:10" ></div>
+  <div id="brushClip" style="position:absolute;left:100px;height:100px;z-index:11" ></div>
+  </div>
+  <!-- control pad -->
+  <div id="output" class="blur" ></div>
+  <div id="progress" class="blur" ></div>
+  <div class="box" onmousemove="centralPad(event, 0, 0)">
+    <div class="trigger" id="circle_btn2"><canvas id="control_canvas" width="400px" height="400px" style="left:0px;top:0px;border:1px"></canvas></div>
+    <div class="popcircle">
+      <ul id="pops2">
+        <li>
+          <a href="">
+            <img src="img/right_icon.png" class="righticon">
+            <img id="rmsk" src="img/right_mask.png" class="righticon">
+            <img src="img/video_icon.png" class="righticon"><br>
+          </a>
+        </li>
+        <li>
+          <a href="">
+            <img src="img/down_icon.png" class="downicon">
+            <img id = "dmsk" src="img/down_mask.png" class="downicon">
+            <img src="img/canvas_icon.png" class="downicon"><br>
+          </a>
+        </li>
+        <li>
+          <a href="">
+            <img src="img/left_icon.png" class="lefticon">
+            <img id="lmsk" src="img/left_mask.png" class="lefticon">
+            <img src="img/slide_icon.png" class="lefticon">
+          </a>
+        </li>
+        <li>
+          <a href="">
+            <img src="img/up_icon.png" class="upicon">
+            <img id="umsk"src="img/up_mask.png" class="upicon">
+            <img src="img/gallery_icon.png" class="upicon"><br>
+          </a>
+        </li>
+      </ul>
     </div>
-  </body>
+  </div>
+  <img id="tutorial_img" style=" opacity:0; position: absolute; top:0; left: 0; height:100%; width:100%; z-index:0;" onclick="nextTutorial()" />
+  <img id='help1' src="img/gesture/h_canvas_pokein.png"/>
+  <img id='help2' src="img/gesture/h_canvas_movefinger.png"/>
+  <img id='help3' src="img/gesture/h_canvas_movestop.png"/>
+  <img id='help4' src="img/gesture/h_canvas_movetocorner.png"/>
+  <img id='help5' src="img/gesture/h_canvas_movetoside.png"/>
+  <img id='help6' src="img/gesture/h_canvas_movetotop.png"/>
+</body>
 </html>

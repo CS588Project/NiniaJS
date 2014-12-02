@@ -11,6 +11,7 @@
   <script src="js/leap.rigged-hand-0.1.4.min.js"></script>
   <link rel="stylesheet" type="text/css" href="css/controlpad.css">
   <script src="js/controlpad.js"></script>
+  <script src="js/tutorial.js"></script>
   <script language="JavaScript" type="text/javascript" src="js/pdfjs/build/pdf.js"></script>
   <script language="JavaScript" type="text/javascript" src="js/pdfpage.js"></script>
   <script language="JavaScript" type="text/javascript" src="js/pdfjs/web/compatibility.js"></script>
@@ -51,7 +52,7 @@
 <div id="output" class="blur" ></div>
 <div id="progress" class="blur" ></div>
 <div class="box" onmousemove="centralPad(event, 0, 0)">
-  <div class="trigger" id="circle_btn2"><canvas id="myCanvas" width="400px" height="400px" style="left:0px;top:0px;border:1px"></canvas></div>
+  <div class="trigger" id="circle_btn2"><canvas id="control_canvas" width="400px" height="400px" style="left:0px;top:0px;border:1px"></canvas></div>
   <div class="popcircle">
     <ul id="pops2">
       <li>
@@ -85,5 +86,12 @@
     </ul>
   </div>
 </div>
+<img id="tutorial_img" style=" opacity:0; position: absolute; top:0; left: 0; height:100%; width:100%; z-index:0;" onclick="nextTutorial()" />
+<img id='help1' src="img/gesture/h_slide_wave.png"/>
+<img id='help2' src="img/gesture/h_slide_flipup.png"/>
+<img id='help3' src="img/gesture/h_blank.png"/>
+<img id='help4' src="img/gesture/h_slide_circle.png"/>
+<img id='help5' src="img/gesture/h_blank.png"/>
+<img id='help6' src="img/gesture/h_blank.png"/>
 </body>
 </html>
