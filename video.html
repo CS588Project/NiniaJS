@@ -29,6 +29,7 @@
 <div class="blur">
   <div id="theflow" class="ContentFlow">
       <div class="flow" id="anchorToAddImage">
+          <!--
           <div class="item">
               <img class="content"> </img>
           </div>
@@ -41,6 +42,7 @@
           <div class="item">
               <img class="content"> </img>
           </div>
+          -->
       </div>
 
       <div class="loadIndicator"></div>
@@ -49,17 +51,57 @@
 </div>
 
 <script type="text/javascript">
+    function loadConfiguration(){
+      var xmlhttp;
+      if(window.XMLHttpRequest){// code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp = new XMLHttpRequest();
+      }
+      else{// code for IE6, IE5
+        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+      }
+      xmlhttp.onreadystatechange = function(){
+        if(xmlhttp.readyState == 4 && xmlhttp.status == 200){
+          var id = JSON.parse(xmlhttp.responseText);
+          for(var i = 0; i < id.ids.length; i++){
+            videoIds.push(id.ids[i]);
+          }
+          var anchor = document.getElementById("anchorToAddImage");
+          for(var i = 0; i < videoIds.length; i++){
+            var innerDiv = document.createElement('div');
+            innerDiv.className = "item";
+            var innerImg = document.createElement('img');
+            innerImg.className = "content";
+            innerImg.src = "http://img.youtube.com/vi/" + videoIds[i] + "/0.jpg";
+            innerDiv.appendChild(innerImg);
+            anchor.appendChild(innerDiv);
+          }
+        }
+      }
+      xmlhttp.open("GET","videos.json",true);
+      xmlhttp.send();
+    }
     var popingup = false;
     var w = window.innerWidth;
     var h = window.innerHeight;
-    var videoIds = ["XGSy3_Czz8k", "5M4ex28qxFM", "zXKUDKGXi1c", "HkMNOlYcpHg"];
+    var videoIds = [];
     $(document).ready(function(){
         myNewFlow = new ContentFlow('theflow', {endOpacity:0.5, visibleItems:4, relativeItemPosition:'center top', maxItemHeight:0.5*h, flowSpeedFactor:0.5});
         
-        var items = document.getElementById("anchorToAddImage").getElementsByTagName("div");
+        loadConfiguration();
+        /*var anchor = document.getElementById("anchorToAddImage");
+        for(var i = 0; i < videoIds.length; i++){
+            var innerDiv = document.createElement('div');
+            innerDiv.className = "item";
+            var innerImg = document.createElement('img');
+            innerImg.className = "content";
+            innerImg.src = "http://img.youtube.com/vi/" + videoIds[i] + "/0.jpg";
+            innerDiv.appendChild(innerImg);
+            anchor.appendChild(innerDiv);
+        }*/
+        /*var items = document.getElementById("anchorToAddImage").getElementsByTagName("div");
         for(var i = 0; i < items.length; i++){
             items[i].getElementsByTagName("img")[0].src = "http://img.youtube.com/vi/" + videoIds[i] + "/0.jpg";
-        }
+        }*/
 
         $(document).keydown(function(e){
             if(e.which == 88){
