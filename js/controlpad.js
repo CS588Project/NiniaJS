@@ -1,9 +1,11 @@
 //global var
 var triggerFlag;
 var menuClickFlag;
+var firstClickFlag;//firstClickFlag!///
 
 $(document).ready(function(){
   triggerFlag = false;
+  firstClickFlag = true;
   $(".blur").addClass("disableBlur");
   var canvasElement=document.getElementById("control_canvas");
   var displayArea=canvasElement.getContext("2d");
@@ -33,7 +35,12 @@ $(document).ready(function(){
       progress = document.getElementById("progress");
       output.innerHTML = hand.grabStrength.toPrecision(2);
       progress.style.width = hand.grabStrength * 100 + '%';
-      if(hand.grabStrength >= 0.9 && triggerFlag == false){
+      //firstClickFlag!///
+      if(firstClickFlag == true && hand.grabStrength < 0.8){
+        firstClickFlag = false;
+      }
+      ////////////////////
+      if(hand.grabStrength >= 0.9 && triggerFlag == false && firstClickFlag == false){
         $('.trigger').trigger("dblclick");
         //triggerFlag = true;
       }
