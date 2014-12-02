@@ -31,10 +31,11 @@ $(document).ready(function(){
   var controllerOptions = {enableGestures: true, background: true};
   Leap.loop(controllerOptions, {
     hand: function(hand){
-      var output = document.getElementById("output"),
-      progress = document.getElementById("progress");
-      output.innerHTML = hand.grabStrength.toPrecision(2);
-      progress.style.width = hand.grabStrength * 100 + '%';
+      //var output = document.getElementById("output"),
+      //progress = document.getElementById("progress");
+      //output.innerHTML = hand.grabStrength.toPrecision(2);
+      //progress.style.width = hand.grabStrength * 100 + '%';
+      //progress.style.width = hand.grabStrength * 100 + '%';
       //firstClickFlag!///
       if(firstClickFlag == true && hand.grabStrength < 0.8){
         firstClickFlag = false;
@@ -63,10 +64,10 @@ $(document).ready(function(){
         var canvasY = canvasElement.height * (1 - normalizedPosition[1]);
         //we can ignore z for a 2D context
         
-        displayArea.strokeText("(" + canvasX.toFixed(1) + ", " + canvasY.toFixed(1) + ")", canvasX, canvasY);
+        //displayArea.strokeText("(" + canvasX.toFixed(1) + ", " + canvasY.toFixed(1) + ")", canvasX, canvasY);
         var coords4 = "canvasX: " + canvasX + ", canvasY: " + canvasY + ", canvasWidth:" 
                       + canvasElement.width+" canvasHeight:"+ canvasElement.height;
-        document.getElementById("demo4").innerHTML = "<font color=\"red\">" + coords4+"</font>";
+        //document.getElementById("demo4").innerHTML = "<font color=\"red\">" + coords4+"</font>";
         centralPad(null, canvasX, canvasY);
       }
     }
@@ -146,9 +147,9 @@ function centralPad(event, leapCanvasX, leapCanvasY){
   var coords1 = "offsetx: " + offsetx + ", offsety: " + offsety;
   var coords2 = "div_pos.left: " + divCX + ", div_pos.top: " + divCY;
   var coords3 = "event.clientX: " + cX + ", event.clientY: " + cY;
-  document.getElementById("demo").innerHTML = "<font color=\"red\">" + coords1+"</font>";
-  document.getElementById("demo2").innerHTML = "<font color=\"red\">" + coords2+"</font>";
-  document.getElementById("demo3").innerHTML = "<font color=\"red\">" + coords3+"</font>";
+  //document.getElementById("demo").innerHTML = "<font color=\"red\">" + coords1+"</font>";
+  //document.getElementById("demo2").innerHTML = "<font color=\"red\">" + coords2+"</font>";
+  //document.getElementById("demo3").innerHTML = "<font color=\"red\">" + coords3+"</font>";
   cursor(event, leapCanvasX, leapCanvasY);
 }
 
