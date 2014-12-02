@@ -4,6 +4,7 @@ body{
 }
  #myCanvas{         
 	display: block;
+	position: absolute;
 }
 
 .menuHolder {width:100px; height:100px; margin:0px 0 250px 0px; position:absolute; left:0px; top:0px;} 
