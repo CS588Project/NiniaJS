@@ -19,23 +19,26 @@ $(document).ready( function(){
     t_set = ['t_slides_wave','t_slides_flipup', 't_slides_circle', 't_slides_flipup'];
   }
 
-  if(checkCookie(fcheck)) return 0;
+  if(checkCookie(fcheck)){
+    document.getElementById('tutorial_img').style.visibility='hidden';
+    return 0;
+  }
   else setCookie(fcheck, true, 1); 
-  document.getElementById('tutorial_img').style.zIndex='100';
+  document.getElementById('tutorial_img').style.visibility='visible';
   $('.blur').removeClass("disableTutorial").removeClass("enableBlur").addClass("enableTutorial");
   console.log(location.pathname);
 
   nextTutorial();
 });
 
-function nextTutorial() {
-  
+function nextTutorial() { 
   var t_img = document.getElementById('tutorial_img');
   var t_src = document.createAttribute('src');
 
   if(tutorial_idx >= t_set.length){
     $("#tutorial_img").animate({ opacity:'0'}, 'slow');
     t_img.style.zIndex='0';
+    document.getElementById('tutorial_img').style.visibility='hidden';
     $('.blur').removeClass("enableTutorial");
     return false;
   } else{
