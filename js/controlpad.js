@@ -41,11 +41,11 @@ $(document).ready(function(){
         firstClickFlag = false;
       }
       ////////////////////
-      if(hand.grabStrength >= 0.9 && triggerFlag == false && firstClickFlag == false){
+      if(hand.confidence> 0.5 && hand.grabStrength >= 0.9 && triggerFlag == false && firstClickFlag == false){
         $('.trigger').trigger("dblclick");
         //triggerFlag = true;
       }
-      if(hand.grabStrength < 0.9 && triggerFlag == true){
+      if(hand.confidence > 0.5 && hand.grabStrength < 0.9 && triggerFlag == true){
         $('.trigger').trigger("dblclick");
         //triggerFlag = false;
       }
@@ -70,12 +70,84 @@ $(document).ready(function(){
         //document.getElementById("demo4").innerHTML = "<font color=\"red\">" + coords4+"</font>";
         centralPad(null, canvasX, canvasY);
       }
+
+      if (document.title == "Ninia - Video"){
+        videoControl(frame);
+        if(openvideo) {
+          AjaxPage( "youtube", "js/youtube.js" ); 
+          youtubeControl(frame);
+        }
+      }
+      else if(document.title == "Ninia - Gallery"){
+        galleryControl(frame);
+      }
+      else if(document.title == "Ninia - Canvas"){
+        canvasControl(frame);
+      }
+      else if(document.title == "Ninia - Slides"){
+        ;
+      }
     }
-  });
+
+  }).use('screenPosition', {
+      scale: 1
+  })
+  .use('handEntry')
+  //trigger hand in-out
+  .on('handFound', function(){
+      handOut();
+  })
+  .on('handLost',  function(){
+    if (document.title == "Ninia - Video"){
+      ;
+    }
+    else if(document.title == "Ninia - Gallery"){
+      if(twoHandsFlag == true && isScalingFlag == true){
+        isScalingFirstFlag = false;
+      }
+      console.log('hand lost'); 
+      if(leftOrRight == 1 && canvasWholeX <=20 && !imgToFullScreen && twoHandsFlag == false){//left
+        moveToIndex(-3);
+      }
+      else if(leftOrRight == 2 && canvasWholeX >= window.innerWidth -50 && !imgToFullScreen && twoHandsFlag == false){//right
+        moveToIndex(3);
+      }
+    }
+    else if(document.title == "Ninia - Canvas"){
+      ;
+    }
+    else if(document.title == "Ninia - Slides"){
+      ;
+    } 
+  })
+
+  if(document.title == "Ninia - Welcome"){    
+    Leap.loopController.use('riggedHand').use('playback', {
+      recording: 'sample_gesture/leap-playback-recording-75fps.json.lz',
+      pauseOnHand: true,
+      requiredProtocolVersion: 6,
+      offset: new THREE.Vector3(0,-50,0)
+    });
+
+    document.getElementById('help1').style.visibility = 'hidden';
+    document.getElementById('help2').style.visibility = 'hidden';
+    document.getElementById('help3').style.visibility = 'hidden';
+    document.getElementById('help4').style.visibility = 'hidden';
+    document.getElementById('help5').style.visibility = 'hidden';
+    document.getElementById('help6').style.visibility = 'hidden';
+  }
   /*********************************************************
-  * End of the actual example
+  * End
   ****************************************************/
 });
+
+function handOut() {
+    firstTimeIn = true;
+    leftOrRight = 0;
+    actLeftOrRight = 0;
+    flowSpeed = 1;
+}
+
 function centralPad(event, leapCanvasX, leapCanvasY){
   var div_pos = $(".box").position();
   var divCX = div_pos.left;
@@ -215,3 +287,77 @@ function hideHelp(){
     });
   });
 }
+
+
+function GetHttpRequest() 
+{ 
+    if ( window.XMLHttpRequest ) // Gecko 
+        return new XMLHttpRequest() ; 
+    else if ( window.ActiveXObject ) // IE 
+        return new ActiveXObject("MsXml2.XmlHttp") ; 
+} 
+
+function AjaxPage(sId, url){ 
+    var oXmlHttp = GetHttpRequest() ; 
+
+    oXmlHttp.OnReadyStateChange = function()  { 
+        if ( oXmlHttp.readyState == 4 ) 
+        { 
+
+            if ( oXmlHttp.status == 200 || oXmlHttp.status == 304 ) 
+
+            { 
+
+                IncludeJS( sId, url, oXmlHttp.responseText ); 
+
+            } 
+
+            else 
+
+            { 
+
+                alert( 'XML request error: ' + oXmlHttp.statusText + ' (' + oXmlHttp.status + ')' ) ; 
+
+            } 
+
+        } 
+
+    } 
+
+
+
+    oXmlHttp.open('GET', url, true); 
+
+    oXmlHttp.send(null); 
+
+} 
+
+
+
+function IncludeJS(sId, fileUrl, source) 
+{ 
+
+    if ( ( source != null ) && ( !document.getElementById( sId ) ) ){ 
+
+        var oHead = document.getElementsByTagName('HEAD').item(0); 
+
+        var oScript = document.createElement( "script" ); 
+
+
+
+        oScript.language = "javascript"; 
+
+        oScript.type = "text/javascript"; 
+
+        oScript.id = sId; 
+
+        oScript.defer = true; 
+
+        oScript.text = source; 
+
+
+
+        oHead.appendChild( oScript ); 
+
+    } 
+} 

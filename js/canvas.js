@@ -1,4 +1,3 @@
-
 //global variables
 var canvas = null, ctx = null; // canvas context
 var drawStarted = false; 
@@ -7,8 +6,12 @@ var cur_state="IDLE",prev_state=null;
 var eraseStarted = false;
 var colorPaletteStarted = false;
 
+var globalColorHanging = "gray";
 var globalColor = "gray";
+var globalColorTemp = "";
 var globalThick = 5;
+var globalBrushType = "marker";
+var prevGlobalColor = "gray";
 
 var iniColorGroup1 = 0,iniColorGroup4 = 90, iniColorGroup3 = 180, iniColorGroup2 = 270, stepAngle = 0, curColorGroup = 1;
 var reg1,reg2 = true;
@@ -19,29 +22,17 @@ var cursorX, cursorY;
 var cursorLeapMotion = null;
 var globalHand = "right"; //default;
 var gestureFrameCount = 0;
+var pat = null;
+
 
 /************* For Real Time Output ***********************/
+/*
 var distanceDisplay;
 var cursorXY;
 var handType;
+*/
 /**************** For Real Time Output*********************/
     
-/*    
-//global variables
-var canvas = null, ctx = null; // canvas context
-var started = false; 
-var globalGesture = null;   
-var timer = null; // used to detech shaking hands by recognizing KeyTap getsture
-var timerStarted = false;
-var keyTapNum = 0;
-var cur_state="IDLE",prev_state=null;
-var eraseStarted = false;
-var colorPaletteStarted = false;
-var globalColor = "black";
-var iniColorGroup1 = 0,iniColorGroup4 = 90, iniColorGroup3 = 180, iniColorGroup2 = 270, stepAngle = 0, curColorGroup = 1;
-var reg1,reg2 = true;
-var circleDirection;
-*/
 
 $(document).ready(function() {  
   $(document.body).css({
@@ -53,9 +44,11 @@ $(document).ready(function() {
   function resizeCanvas() {
     $("#myCanvas").attr("width", $(window).get(0).innerWidth);
     $("#myCanvas").attr("height", $(window).get(0).innerHeight);
-  //  console.log($(window).get(0).innerHeight);
-  };
+  initialCanvasLayout();
   //console.log($(window).get(0).innerWidth);
+  //console.log($(window).get(0).innerHeight);
+  };
+  
     /************* For Real Time Output ***********************/
     distanceDisplay = document.getElementById("distance");
     cursorXY = document.getElementById("cursorXY");
@@ -65,33 +58,50 @@ $(document).ready(function() {
   initialDrawingCanvas();
   //Initialize the color palette
   initialColorPalette();
+
   });
   
   
+  function initialCanvasLayout(){
+  
+  document.getElementById("brushThickness").style.top = $(window).get(0).innerHeight-150 + "px";
+  document.getElementById("brushThicknessHover").style.top = $(window).get(0).innerHeight-150 + "px";
+  
+  document.getElementById("brushType").style.top = $(window).get(0).innerHeight-150 - 150 + "px";
+  document.getElementById("brushTypeHover").style.top = $(window).get(0).innerHeight-150 - 150 + "px";
+  
+  document.getElementById("paint").style.top = $(window).get(0).innerHeight-100 + "px";
+  document.getElementById("crayon").style.top = $(window).get(0).innerHeight-100-100 + "px";
+  document.getElementById("marker").style.top = $(window).get(0).innerHeight-100-100-100 + "px";
+  
+  document.getElementById("large").style.top = $(window).get(0).innerHeight-100 + "px";
+  document.getElementById("medium").style.top = $(window).get(0).innerHeight-100-100 + "px";
+  document.getElementById("small").style.top = $(window).get(0).innerHeight-100-100-100 + "px";
+  
+  //console.log("initial canvas layout");
+  }
   
   // Setup Leap loop with frame callback function
-  var controllerOptions = {enableGestures: true};
-
-  Leap.loop(controllerOptions, function(frame) {
-  if(frame.pointables.length > 0){
-    getLeapPosition(leapValid,frame);           
-    overlappingDetection();
-    drawingANDerasing(frame);
-    if(colorPaletteStarted==true){
-      if( Math.sqrt(cursorX*cursorX+cursorY*cursorY)>100 )
-        mouseMove(null,cursorX,cursorY);
+  function canvasControl (frame) {
+    if(frame.pointables.length > 0){
+      getLeapPosition(leapValid,frame);           
+      overlappingDetection();
+      drawingANDerasing(frame);
+      if(colorPaletteStarted==true){
+        if( Math.sqrt(cursorX*cursorX+cursorY*cursorY)>100 )
+          mouseMove(null,cursorX,cursorY);
+      }
+      
+      gestureDetection(frame);
+    
+    }else{
+      leapValid=false;
+      cursorLeapMotion.style.visibility="hidden";
+      resetBrushMenu();
+      resetColorPallette();
     }
-    
-    gestureDetection(frame);
+  }
   
-  }else{
-    leapValid=false;
-    cursorLeapMotion.style.visibility="hidden";
-    resetBrushMenu();
-    resetColorPallette();
-  } 
-  })
-    
     var overlaps = (function () {
       function getPositions( elem ) {
         var pos, width, height;
@@ -120,18 +130,49 @@ $(document).ready(function() {
           var colorPalette = document.getElementById("colorPalette");
           var brushTypeButton = $( '#brushType' )[0]
           var brushThicknessButton = $('#brushThickness')[0];
-          var crayon1Button = $( '#crayon1' )[0];
-          var crayon2Button = $( '#crayon2' )[0];
-          var crayon3Button = $( '#crayon3' )[0];
+          var crayon1Button = $( '#marker' )[0];
+          var crayon2Button = $( '#crayon' )[0];
+          var crayon3Button = $( '#paint' )[0];
           var smallButton = $( '#small' )[0];
           var mediumButton = $( '#medium' )[0];
           var largeButton = $( '#large' )[0];
           var brushChoiceButton = $( '#brushChoice' );
           
-          var crayonRed = document.getElementById('crayonRed');
-          var crayonBlue = document.getElementById('crayonBlue');
+      /*************************** Crayon Brush Color *****************************/
+          var crayonBrown = document.getElementById('crayonBrown');
+          var crayonPurple = document.getElementById('crayonPurple');
+          var crayonPink = document.getElementById('crayonPink');     
+
+          var crayonMagenta = document.getElementById('crayonMagenta');
+          var crayonMaroon = document.getElementById('crayonMaroon');
+          var crayonGold = document.getElementById('crayonGold');     
+      
+          var crayonGreen = document.getElementById('crayonGreen');
+          var crayonGray = document.getElementById('crayonGray');
+          var crayonWhite = document.getElementById('crayonWhite');       
+
           var crayonYellow = document.getElementById('crayonYellow');
+          var crayonRed = document.getElementById('crayonRed');
+          var crayonBlue = document.getElementById('crayonBlue'); 
+      /*************************** Crayon Brush Color *****************************/    
           
+      /*************************** Paint Brush Color *****************************/
+          var paintBrown = document.getElementById('paintBrown');
+          var paintPurple = document.getElementById('paintPurple');
+          var paintPink = document.getElementById('paintPink');     
+
+          var paintMagenta = document.getElementById('paintMagenta');
+          var paintMaroon = document.getElementById('paintMaroon');
+          var paintGold = document.getElementById('paintGold');     
+      
+          var paintGreen = document.getElementById('paintGreen');
+          var paintGray = document.getElementById('paintGray');
+          var paintWhite = document.getElementById('paintWhite');       
+
+          var paintYellow = document.getElementById('paintYellow');
+          var paintRed = document.getElementById('paintRed');
+          var paintBlue = document.getElementById('paintBlue'); 
+      /*************************** Crayon Brush Color *****************************/  
           
           if(globalHand == "left")
             return;
@@ -144,11 +185,11 @@ $(document).ready(function() {
             
           }else if(overlaps( leapCursor,brushTypeButton )==true){
           
-            $( '#brushType' ).addClass("blur");
+            $( '#brushType' ).addClass("blur2");
             document.getElementById("brushTypeHover").style.zIndex=11;
-            $( '#brushThickness' ).removeClass("blur");
+            $( '#brushThickness' ).removeClass("blur2");
             document.getElementById("brushThicknessHover").style.zIndex=9;
-            console.log("collide with brush type");
+           // console.log("collide with brush type");
             closeBrushThicknessL2();
             document.getElementById('small').innerText = "";
             document.getElementById('medium').innerText = "";
@@ -163,109 +204,184 @@ $(document).ready(function() {
             document.getElementById("brushType").style.opacity=1.0;
             document.getElementById("brushThickness").style.opacity=1.0;
             
-            $("#crayon1").text("Brush Type 1");
-            $("#crayon2").text("Brush Type 2");
-            $("#crayon3").text("Brush Type 3");       
-            document.getElementById('crayon1').style.color="white";
-            document.getElementById('crayon2').style.color="white";
-            document.getElementById('crayon3').style.color="white";
+            $("#marker").text("marker");
+      document.getElementById("marker").style.textAlign="center";
+            $("#crayon").text("crayon");
+      document.getElementById("crayon").style.textAlign="center";
+            $("#paint").text("paint");       
+      document.getElementById("paint").style.textAlign="center";
+      
+            document.getElementById('marker').style.color="white";
+            document.getElementById('crayon').style.color="white";
+            document.getElementById('paint').style.color="white";
             
           }else if(overlaps(leapCursor,brushThicknessButton)==true){
           
-            console.log("collide with brush thickness");
-            $( '#brushThicknessButton' ).addClass("blur");
+           // console.log("collide with brush thickness");
+            $( '#brushThicknessButton' ).addClass("blur2");
             document.getElementById("brushThicknessHover").style.zIndex=11;
-            $( '#brushType' ).removeClass("blur");
+            $( '#brushType' ).removeClass("blur2");
             document.getElementById("brushTypeHover").style.zIndex=9;
         
-            console.log("collide with brush thickness");
+        //    console.log("collide with brush thickness");
             closeBrushTypeL2();
-            document.getElementById('crayon1').innerText = "";
-            document.getElementById('crayon2').innerText = "";
-            document.getElementById('crayon3').innerText = "";
+            document.getElementById('marker').innerText = "";
+            document.getElementById('crayon').innerText = "";
+            document.getElementById('paint').innerText = "";
             openBrushThicknessL2();
             if(prevState == "brushThicknessL2"||prevState == "brushTypeL2"){
               brushChoiceButton.css({"width":"0px"});
               document.getElementById("brushClip").style.width =  "0px"
             }
     
-            $("#small").text("Brush Small");
-            $("#medium").text("Brush Medium");
-            $("#large").text("Brush Large");        
+            $("#small").text("small");
+      document.getElementById("small").style.textAlign="center";
+            $("#medium").text("medium");
+      document.getElementById("medium").style.textAlign="center";
+            $("#large").text("large");        
+      document.getElementById("large").style.textAlign="center";
+      
             document.getElementById('small').style.color="white";
             document.getElementById('medium').style.color="white";
             document.getElementById('large').style.color="white";
             
           }else{
             if(overlaps(leapCursor,crayon1Button)==true){
-              brushChoiceButton.css({"width":"25px","top":"333px"});
+      
+              brushChoiceButton.css({"width":"25px","top":crayon1Button.style.top+""});
                 document.getElementById("brushClip").style.width =  cursorX-100+"px"
-                document.getElementById("brushClip").style.top = "333px";
+                document.getElementById("brushClip").style.top = crayon1Button.style.top+"";
                 document.getElementById("brushClip").style.backgroundColor = "rgb(167,71,8)";
-              prevState2 = "crayon1";
+              prevState2 = "marker";
               prevState = "brushTypeL2";
+        
+    
             }else if(overlaps(leapCursor,crayon2Button)==true){
               
-              brushChoiceButton.css({"width":"25px","top":"433px"});
+              brushChoiceButton.css({"width":"25px","top":crayon2Button.style.top+""});
                 document.getElementById("brushClip").style.width =  cursorX-100+"px"
-                document.getElementById("brushClip").style.top = "433px";
+                document.getElementById("brushClip").style.top = crayon2Button.style.top+"";
                 document.getElementById("brushClip").style.backgroundColor = "rgb(167,71,8)";
-              prevState2 = "crayon2";
+              prevState2 = "crayon";
               prevState = "brushTypeL2";
             }else if(overlaps(leapCursor,crayon3Button)==true){
-              brushChoiceButton.css({"width":"25px","top":"533px"});
+              brushChoiceButton.css({"width":"25px","top":crayon3Button.style.top+""});
                 document.getElementById("brushClip").style.width =  cursorX-100+"px"
-                document.getElementById("brushClip").style.top = "533px";
+                document.getElementById("brushClip").style.top = crayon3Button.style.top+"";
                 document.getElementById("brushClip").style.backgroundColor = "rgb(167,71,8)";
-              prevState2 = "crayon3";
+              prevState2 = "paint";
               prevState = "brushTypeL2";
             }else if(overlaps(leapCursor,smallButton)==true){
-              brushChoiceButton.css({"width":"25px","top":"333px"});
+      
+              brushChoiceButton.css({"width":"25px","top":smallButton.style.top+""});
                 document.getElementById("brushClip").style.width =  cursorX-100+"px"
-                document.getElementById("brushClip").style.top = "333px";
+                document.getElementById("brushClip").style.top = smallButton.style.top+"";
                 document.getElementById("brushClip").style.backgroundColor = "rgb(167,71,8)";
               prevState2 = "small";
               prevState = "brushThicknessL2";
             }else if(overlaps(leapCursor,mediumButton)==true){
-              brushChoiceButton.css({"width":"25px","top":"433px"});
+              brushChoiceButton.css({"width":"25px","top":mediumButton.style.top+""});
               
                 document.getElementById("brushClip").style.width =  cursorX-100+"px"
-                document.getElementById("brushClip").style.top = "433px";
+                document.getElementById("brushClip").style.top = mediumButton.style.top+"";
                 document.getElementById("brushClip").style.backgroundColor = "rgb(167,71,8)";
               prevState2 = "medium";
               prevState = "brushThicknessL2";
             }else if(overlaps(leapCursor,largeButton)==true){
-              brushChoiceButton.css({"width":"25px","top":"533px"});
+              brushChoiceButton.css({"width":"25px","top":largeButton.style.top+""});
               
                 document.getElementById("brushClip").style.width =  cursorX-100+"px"
-                document.getElementById("brushClip").style.top = "533px";
+                document.getElementById("brushClip").style.top = largeButton.style.top+"";
                 document.getElementById("brushClip").style.backgroundColor = "rgb(167,71,8)";
               prevState2 = "large";
               prevState = "brushThicknessL2";
             }else{    
               if( prevState == "brushTypeL2" && cursorX>200){
-                if(prevState2 == "crayon1"){
-                  console.log("crayon1");
-                  var pat=ctx.createPattern(crayonRed,"repeat");
-                  globalColor = pat;
-                }else if(prevState2 == "crayon2"){
-                  console.log("crayon2");
-                  var pat=ctx.createPattern(crayonBlue,"repeat");
-                  globalColor = pat;
-                }else if(prevState2 == "crayon3"){
-                  console.log("crayon3");
-                  var pat=ctx.createPattern(crayonYellow,"repeat");
-                  globalColor = pat;
+        
+                if(prevState2 == "marker"){  /* if choose marker */
+                  console.log("marker");
+          globalBrushType = "marker";
+         // globalColor = prevGlobalColor;
+        //  globalColorHanging = prevGlobalColor;
+          $("#innerBrushType").css("background-image","url(img/quill_pen.png)");
+         // console.log("marker: " + prevGlobalColor);
+                }else if(prevState2 == "crayon"){   /* if choose crayon */
+                  console.log("crayon");
+          globalBrushType = "crayon";
+          var tempGlobalColor = globalColor+"";
+        //  var pat = null;
+        //  prevGlobalColor = globalColor;
+        //  globalColorHanging = prevGlobalColor;
+          switch (tempGlobalColor) {
+          
+            case "rgb(165, 42, 42)":   pat=ctx.createPattern(crayonBrown,"repeat");    break;
+            case "rgb(128, 0, 128)":   pat=ctx.createPattern(crayonPurple,"repeat");  break;
+            case "rgb(255, 192, 203)":   pat=ctx.createPattern(crayonPink,"repeat");   break;
+            
+            case "rgb(255, 0, 255)":   pat=ctx.createPattern(crayonMagenta,"repeat");    break;
+            case "rgb(128, 0, 0)":   pat=ctx.createPattern(crayonMaroon,"repeat");   break;
+            case "rgb(255, 215, 0)":   pat=ctx.createPattern(crayonGold,"repeat");   break;
+
+            case "rgb(0, 128, 0)":   pat=ctx.createPattern(crayonGreen,"repeat");    break;
+            case "rgb(128, 128, 128)":   pat=ctx.createPattern(crayonGray,"repeat");   break;
+            case "rgb(255, 255, 255)":   pat=ctx.createPattern(crayonWhite,"repeat");    break;
+
+            case "rgb(255, 255, 0)":   pat=ctx.createPattern(crayonYellow,"repeat");   break;
+            case "rgb(255, 0, 0)":   pat=ctx.createPattern(crayonRed,"repeat");    break;
+            case "rgb(0, 0, 255)":   pat=ctx.createPattern(crayonBlue,"repeat");  break;
+            case "gray":             pat=ctx.createPattern(crayonGray,"repeat");   break;
+            
+            default:
+
+          }  
+                  
+          $("#innerBrushType").css("background-image","url(img/chalk.png)");
+          
+                }else if(prevState2 == "paint"){   /* if choose paint */
+                  console.log("paint");
+          globalBrushType = "paint";
+                  var tempGlobalColor = globalColor+"";
+         // var pat = null;
+        //  prevGlobalColor = globalColor;
+         // globalColorHanging = prevGlobalColor;
+          switch (tempGlobalColor) {
+          
+            case "rgb(165, 42, 42)":   pat=ctx.createPattern(paintBrown,"repeat");   break;
+            case "rgb(128, 0, 128)":   pat=ctx.createPattern(paintPurple,"repeat");  break;
+            case "rgb(255, 192, 203)":   pat=ctx.createPattern(paintPink,"repeat");   break;
+            
+            case "rgb(255, 0, 255)":   pat=ctx.createPattern(paintMagenta,"repeat");   break;
+            case "rgb(128, 0, 0)":   pat=ctx.createPattern(paintMaroon,"repeat");   break;
+            case "rgb(255, 215, 0)":   pat=ctx.createPattern(paintGold,"repeat");   break;
+
+            case "rgb(0, 128, 0)":   pat=ctx.createPattern(paintGreen,"repeat");   break;
+            case "rgb(128, 128, 128)":   pat=ctx.createPattern(paintGray,"repeat");   break;
+            case "rgb(255, 255, 255)":   pat=ctx.createPattern(paintWhite,"repeat");   break;
+
+            case "rgb(255, 255, 0)":   pat=ctx.createPattern(paintYellow,"repeat");   break;
+            case "rgb(255, 0, 0)":   pat=ctx.createPattern(paintRed,"repeat");   break;
+            case "rgb(0, 0, 255)":   pat=ctx.createPattern(paintBlue,"repeat");   break;
+            case "gray":             pat=ctx.createPattern(paintGray,"repeat");   break;
+            default:    
+
+          }         
+          $("#innerBrushType").css("background-image","url(img/paint_pen.png)");
                 }
+        
               }else if( prevState == "brushThicknessL2" && cursorX>200 ){
-                if(prevState2 == "small")
+                if(prevState2 == "small"){
+          $("#innerBrushThickness").css("background-image","url(img/small.png)");
                   globalThick = 5;
-                else if(prevState2 == "medium")
-                  globalThick = 10;
-                else if(prevState2 == "large")
+                }else if(prevState2 == "medium"){
+                  $("#innerBrushThickness").css("background-image","url(img/medium.png)");
+          globalThick = 10;
+                }else if(prevState2 == "large"){
+          $("#innerBrushThickness").css("background-image","url(img/large.png)");
                   globalThick = 20;
+        }
               }
               resetBrushMenu();
+        
             }
           }
     }
@@ -273,8 +389,8 @@ $(document).ready(function() {
     function getLeapPosition(leapValid,frame){
       if(leapValid==false){
         leapValid = true;
-        cursorLeapMotion.style.left = "500px";
-        cursorLeapMotion.style.top = "500px";
+        cursorLeapMotion.style.left = Math.floor($(window).get(0).innerWidth/2) + "px";
+        cursorLeapMotion.style.top = Math.floor($(window).get(0).innerHeight/2) + "px";
         cursorLeapMotion.style.visibility="visible";
       }
       var pointable = frame.pointables[1];
@@ -284,28 +400,23 @@ $(document).ready(function() {
         cursorY = window.innerHeight * (1 - normalizedPosition[1]);
         cursorLeapMotion.style.left = cursorX/window.innerWidth*100+"%";
         cursorLeapMotion.style.top = cursorY/window.innerHeight*100+"%";
-        cursorXY.innerText = cursorX + "  " + cursorY;
     }
       
     function drawingANDerasing(frame){
         if (frame.hands.length > 0){
           frame.hands.forEach(function(hand){
-            if(hand.type == "left"){
-              handType.innerText = " Left";
+            if(hand.type == "left" && hand.confidence>0.85){
               globalHand = "left";
               leftHandSetting();
-            }else if(hand.type == "right"){
-              handType.innerText = " Right";
+            }else if(hand.type == "right" && hand.confidence>0.85){
               globalHand = "right";
               rightHandSetting();
             }
             if( hand.pinchStrength==0 ){
               globalGesture = "Erase";
-              cursorLeapMotion.innerHTML = "Erase Cursor";
             }
             else{
               globalGesture = "Draw";
-              cursorLeapMotion.innerHTML = "Draw Cursor";
             }
           });
         
@@ -314,51 +425,99 @@ $(document).ready(function() {
             prev_state = cur_state;
             if(touchDistance<0){
               cur_state = "ERASE_ON";
-              cursorLeapMotion.style.backgroundColor="rgb(255,0,0)";
+          
+        $("#leapCursor").css("background-color","");  
+        $('#leapCursor').removeClass("collision");
+        $("#leapCursor").css("width","100px");
+        $("#leapCursor").css("height","100px");
+        $("#leapCursor").css("background-image","url(img/eraser.png)");
+        $("#leapCursor").css("background-size","80% 80%");
+        $("#leapCursor").css("background-repeat","no-repeat");
+        $("#leapCursor").css("background-position","center");
+                
               if(prev_state=="ERASE_OFF"||prev_state=="DRAW_ON"){
                 ctx.beginPath();
                 ctx.strokeStyle="black";
-                ctx.lineWidth=globalThick;
+                ctx.lineWidth=10;
                 drawStarted = true;
               }   
               drawStarted==false?leapTouchDown(cursorX,cursorY):leapTouchMove(cursorX,cursorY);
             }else{
               leapTouchUp();
               cur_state = "ERASE_OFF";
-              cursorLeapMotion.style.backgroundColor="rgb(0,255,0)";
+        
+          var radius = Math.floor(touchDistance*50)+"px";
+        $("#leapCursor").css("background-image","");
+        $("#leapCursor").css("width",radius);
+        $("#leapCursor").css("height",radius);
+        $("#leapCursor").css("border-radius",radius);
+        $("#leapCursor").css("background-color",globalColor);
+        $('#leapCursor').addClass("collision");
+      //  console.log(globalColorHanging);
             }
+      
           }else if( globalGesture=="Draw" ){
             var touchDistance = frame.pointables[1].touchDistance;
               prev_state = cur_state;
             if(touchDistance<0){
               cur_state = "DRAW_ON";
-              cursorLeapMotion.style.backgroundColor="rgb(255,0,0)";
               if(prev_state=="DRAW_OFF" || prev_state=="ERASE_ON"){
-                ctx.beginPath();
-                ctx.strokeStyle=globalColor;
-                ctx.lineWidth=globalThick;
-                drawStarted = true;
+        
+          $("#leapCursor").css("background-color","");
+          $('#leapCursor').removeClass("collision");
+          $("#leapCursor").css("width","100px");
+          $("#leapCursor").css("height","100px");
+          if(globalBrushType=="marker"){
+            $("#leapCursor").css("background-image","url(img/quill_pen.png)");
+          }else if(globalBrushType=="crayon"){
+            $("#leapCursor").css("background-image","url(img/chalk.png)");
+          }else if(globalBrushType=="paint"){
+            $("#leapCursor").css("background-image","url(img/paint_pen.png)");
+          }
+          
+          $("#leapCursor").css("background-size","80% 80%");
+          $("#leapCursor").css("background-repeat","no-repeat");
+          $("#leapCursor").css("background-position","center");
+        
+          console.log("Drawing: " + globalColor);
+          ctx.beginPath();
+          if(globalBrushType=="marker"){
+            ctx.strokeStyle=globalColor;
+          }else if(globalBrushType=="crayon"){
+            ctx.strokeStyle=pat;
+          }else if(globalBrushType=="paint"){
+            ctx.strokeStyle=pat;
+          }
+          
+          ctx.lineWidth=globalThick;
+          drawStarted = true;
               }
-              drawStarted==false?leapTouchDown(cursorX,cursorY):leapTouchMove(cursorX,cursorY);
+             drawStarted==false?leapTouchDown(cursorX,cursorY):leapTouchMove(cursorX,cursorY);
             }else{
               cur_state = "DRAW_OFF";
-              cursorLeapMotion.style.backgroundColor="rgb(0,255,0)";
+        var radius = Math.floor(touchDistance*50)+"px";
+        $("#leapCursor").css("background-image","");
+        $("#leapCursor").css("width",radius);
+        $("#leapCursor").css("height",radius);
+        $("#leapCursor").css("border-radius",radius);
+        $("#leapCursor").css("background-color",globalColor);
+        $('#leapCursor').addClass("collision");
               leapTouchUp();
             }
-            distanceDisplay.innerText = touchDistance;
           }
         }
       } 
   
-        
     function leapTouchDown(leapX,leapY){
     ctx.beginPath(); 
     drawStarted = true;  
     }
+  
     function leapTouchMove(leapX,leapY){
     ctx.lineTo(leapX, leapY);  
     ctx.stroke();  
     }
+  
     function leapTouchUp(){
     drawStarted = false;
     }
@@ -367,9 +526,7 @@ $(document).ready(function() {
         colorPaletteStarted = false;
         resetColorPallette();
     }
-
-
-    
+ 
     function resetColorPallette(){
     
         var resetColor1,resetColor2,resetColor3;
@@ -413,7 +570,7 @@ $(document).ready(function() {
       //document.getElementById("colorPaletteSub4").style.zIndex = 3;
       document.getElementById("colorPaletteSub3").style.zIndex = 3;
       document.getElementById("colorPaletteSub4").style.zIndex = 2;
-      console.log("click-1");
+    //  console.log("click-1");
       }
       else if(curColorGroup==4){
       //document.getElementById("colorPaletteSub2").style.zIndex = document.getElementById("colorPaletteSub3").style.zIndex;
@@ -421,13 +578,13 @@ $(document).ready(function() {
       document.getElementById("colorPaletteSub4").style.zIndex = 3;
       document.getElementById("colorPaletteSub2").style.zIndex = 3;
       document.getElementById("colorPaletteSub1").style.zIndex = 3;
-      console.log("click-4");
+     // console.log("click-4");
       
       }else if(curColorGroup==3){
       //document.getElementById("colorPaletteSub1").style.zIndex = document.getElementById("colorPaletteSub2").style.zIndex;
       document.getElementById("colorPaletteSub2").style.zIndex = 2;
       //document.getElementById("colorPaletteSub1").style.zIndex = 4;
-      console.log("click-3");
+     // console.log("click-3");
       }else if(curColorGroup==2){
       //document.getElementById("colorPaletteSub4").style.zIndex = document.getElementById("colorPaletteSub1").style.zIndex + 1;
       document.getElementById("colorPaletteSub1").style.zIndex = 2;
@@ -437,7 +594,7 @@ $(document).ready(function() {
       document.getElementById("colorPaletteSub2").style.zIndex = 3;
       document.getElementById("colorPaletteSub1").style.zIndex = 3;
       */
-      console.log("click-2");
+   //   console.log("click-2");
       }
       
     
@@ -477,8 +634,6 @@ $(document).ready(function() {
     }
     
     function decreaseColorGroup(){
-      
-      
               stepAngle = -90;
             //if(iniColorGroup1>-180){
               if(curColorGroup==1){
@@ -552,65 +707,72 @@ $(document).ready(function() {
       
       var side = Math.sqrt(cX*cX+cY*cY);
       var alpha = Math.asin(1.0*cY/side)/Math.PI*180;
-      console.log("alpha = "+alpha);
       var beta,fillWidth;
         
       if(alpha>=0&&alpha<30&&colorPaletteStarted==true){         
         
         if(side>300){
-        console.log(globalColor);
-        document.getElementById("realTime").innerText = "Select color: "+globalColor + " Degree is: " + alpha;
-        document.getElementById("colorPalette").style.backgroundColor = globalColor;
-        unTriggerColorPallette();
+        globalColor = globalColorTemp;
+      //globalColorHanging = globalColor;
+      document.getElementById("colorPalette").style.backgroundColor = globalColor;
+      colorPaletteStarted = false;
+      brushTypeColor();
+      unTriggerColorPalletteAnimation0();
+      
         }else{
-        var targetColor;
-        targetColor = (curColorGroup==1)?$(".group1").children().eq(0)[0]:(curColorGroup==4)?$(".group4").children().eq(0)[0]:$(".group3").children().eq(0)[0];
-        targetColor.style.width=100+side+"px";
-        targetColor.style.height=100+side+"px";
-        targetColor.style.borderTopLeftRadius="0px";
-        targetColor.style.borderTopRightRadius="0px";
-        targetColor.style.borderBottomLeftRadius="0px";
-        targetColor.style.borderBottomRightRadius=100+side+"0px";
+      var targetColor;
+      targetColor = (curColorGroup==1)?$(".group1").children().eq(0)[0]:(curColorGroup==4)?$(".group4").children().eq(0)[0]:(curColorGroup==3)?$(".group3").children().eq(0)[0]:$(".group2").children().eq(0)[0];
+  
+      targetColor.style.width=100+side+"px";
+      targetColor.style.height=100+side+"px";
+      targetColor.style.borderTopLeftRadius="0px";
+      targetColor.style.borderTopRightRadius="0px";
+      targetColor.style.borderBottomLeftRadius="0px";
+      targetColor.style.borderBottomRightRadius=100+side+"0px";
     
-        globalColor = window.getComputedStyle(targetColor, null).backgroundColor;
+      globalColorTemp = window.getComputedStyle(targetColor, null).backgroundColor;
         }
         
       }else if(alpha>=30&&alpha<60&&colorPaletteStarted==true){
     
         if(side>300){
-        console.log(globalColor);
-        document.getElementById("realTime").innerText = "Select color: "+globalColor + " Degree is: " + alpha;
-        document.getElementById("colorPalette").style.backgroundColor = globalColor;
-        unTriggerColorPallette();
+      globalColor = globalColorTemp;
+    //  globalColorHanging = globalColor;
+      document.getElementById("colorPalette").style.backgroundColor = globalColor;
+      colorPaletteStarted = false;
+      brushTypeColor();
+      unTriggerColorPalletteAnimation1();
         }else{
-        var targetColor;
-        targetColor = (curColorGroup==1)?$(".group1").children().eq(1)[0]:(curColorGroup==4)?$(".group4").children().eq(1)[0]:$(".group3").children().eq(1)[0];
-        targetColor.style.width=100+side+"px";
-        targetColor.style.height=100+side+"px";
-        targetColor.style.borderTopLeftRadius="0px";
-        targetColor.style.borderTopRightRadius="0px";
-        targetColor.style.borderBottomLeftRadius="0px";
-        targetColor.style.borderBottomRightRadius=100+side+"0px";
-        globalColor = window.getComputedStyle(targetColor, null).backgroundColor;
-        }
+      var targetColor;
+      targetColor = (curColorGroup==1)?$(".group1").children().eq(1)[0]:(curColorGroup==4)?$(".group4").children().eq(1)[0]:(curColorGroup==3)?$(".group3").children().eq(1)[0]:$(".group2").children().eq(1)[0];
+      targetColor.style.width=100+side+"px";
+      targetColor.style.height=100+side+"px";
+      targetColor.style.borderTopLeftRadius="0px";
+      targetColor.style.borderTopRightRadius="0px";
+      targetColor.style.borderBottomLeftRadius="0px";
+      targetColor.style.borderBottomRightRadius=100+side+"0px";
+      globalColorTemp = window.getComputedStyle(targetColor, null).backgroundColor;
+      }
       
       }else if(alpha>=60&&alpha<90&&colorPaletteStarted==true){
     
         if(side>300){
-        console.log(globalColor);
-        document.getElementById("realTime").innerText = "Select color: "+globalColor + " Degree is: " + alpha;
-        document.getElementById("colorPalette").style.backgroundColor = globalColor;
-        unTriggerColorPallette();
+        globalColor = globalColorTemp;
+      //globalColorHanging = globalColor;
+      document.getElementById("colorPalette").style.backgroundColor = globalColor;
+      colorPaletteStarted = false;
+      brushTypeColor();
+      unTriggerColorPalletteAnimation2();
         }else{
-        var targetColor;
-        targetColor = (curColorGroup==1)?$(".group1").children().eq(2)[0]:(curColorGroup==4)?$(".group4").children().eq(2)[0]:$(".group3").children().eq(2)[0];
-        targetColor.style.width=100+side+"px";
-        targetColor.style.height=100+side+"px";
-        targetColor.style.borderTopLeftRadius="0px";
-        targetColor.style.borderTopRightRadius="0px";
-        targetColor.style.borderBottomLeftRadius="0px";
-        targetColor.style.borderBottomRightRadius=100+side+"0px";
-        globalColor = window.getComputedStyle(targetColor, null).backgroundColor;
+      var targetColor;
+      targetColor = (curColorGroup==1)?$(".group1").children().eq(2)[0]:(curColorGroup==4)?$(".group4").children().eq(2)[0]:(curColorGroup==3)?$(".group3").children().eq(2)[0]:$(".group2").children().eq(2)[0];
+      targetColor.style.width=100+side+"px";
+      targetColor.style.height=100+side+"px";
+      targetColor.style.borderTopLeftRadius="0px";
+      targetColor.style.borderTopRightRadius="0px";
+      targetColor.style.borderBottomLeftRadius="0px";
+      targetColor.style.borderBottomRightRadius=100+side+"0px";
+      globalColorTemp = window.getComputedStyle(targetColor, null).backgroundColor;
         }
       }else{
       
@@ -619,8 +781,23 @@ $(document).ready(function() {
 
     function openBrushTypeL2(){
       $(".brushTypeL2").eq(0).css("width","100px");
+    $(".brushTypeL2").eq(0).css("background-image","url(img/quill_pen.png)");
+    $(".brushTypeL2").eq(0).css("background-size","80% 80%");
+    $(".brushTypeL2").eq(0).css("background-repeat","no-repeat");
+    $(".brushTypeL2").eq(0).css("background-position","center bottom");
+   
+    
       $(".brushTypeL2").eq(1).css("width","100px");
+    $(".brushTypeL2").eq(1).css("background-image","url(img/chalk.png)");
+    $(".brushTypeL2").eq(1).css("background-size","80% 80%");
+    $(".brushTypeL2").eq(1).css("background-repeat","no-repeat");
+    $(".brushTypeL2").eq(1).css("background-position","center bottom");
+    
       $(".brushTypeL2").eq(2).css("width","100px");
+    $(".brushTypeL2").eq(2).css("background-image","url(img/paint_pen.png)");
+    $(".brushTypeL2").eq(2).css("background-size","80% 80%");
+    $(".brushTypeL2").eq(2).css("background-repeat","no-repeat");
+    $(".brushTypeL2").eq(2).css("background-position","center bottom");
     }
     
     function closeBrushTypeL2(){
@@ -628,11 +805,29 @@ $(document).ready(function() {
       $(".brushTypeL2").eq(1).css("width","0px");
       $(".brushTypeL2").eq(2).css("width","0px");
     }
+  
     function openBrushThicknessL2(){
       $(".brushThicknessL2").eq(0).css("width","100px");
+    $(".brushThicknessL2").eq(0).css("background-image","url(img/small.png)");
+    $(".brushThicknessL2").eq(0).css("background-size","100% 100%");
+    $(".brushThicknessL2").eq(0).css("background-repeat","no-repeat");
+    $(".brushThicknessL2").eq(0).css("background-position","center bottom");
+    
+    
+    
       $(".brushThicknessL2").eq(1).css("width","100px");
+    $(".brushThicknessL2").eq(1).css("background-image","url(img/medium.png)");
+    $(".brushThicknessL2").eq(1).css("background-size","100% 100%");
+    $(".brushThicknessL2").eq(1).css("background-repeat","no-repeat");
+    $(".brushThicknessL2").eq(1).css("background-position","center bottom");
+    
       $(".brushThicknessL2").eq(2).css("width","100px");
+    $(".brushThicknessL2").eq(2).css("background-image","url(img/large.png)");
+    $(".brushThicknessL2").eq(2).css("background-size","100% 100%");
+    $(".brushThicknessL2").eq(2).css("background-repeat","no-repeat");
+    $(".brushThicknessL2").eq(2).css("background-position","center bottom");
     }
+  
     function closeBrushThicknessL2(){
       $(".brushThicknessL2").eq(0).css("width","0px");
       $(".brushThicknessL2").eq(1).css("width","0px");
@@ -640,9 +835,9 @@ $(document).ready(function() {
     }
   
     function resetBrushMenu(){
-      $( '#brushType' ).removeClass("blur");
+      $( '#brushType' ).removeClass("blur2");
       document.getElementById("brushTypeHover").style.zIndex=9;
-      $( '#brushThickness' ).removeClass("blur");
+      $( '#brushThickness' ).removeClass("blur2");
       document.getElementById("brushThicknessHover").style.zIndex=9;
       prevState = "";
       prevState2 = "";
@@ -650,17 +845,16 @@ $(document).ready(function() {
       $( '#brushClip' ).css({"width":"0px"});
       closeBrushTypeL2();
       closeBrushThicknessL2();
-      document.getElementById('crayon1').innerText = "";
-      document.getElementById('crayon2').innerText = "";
-      document.getElementById('crayon3').innerText = "";
+      document.getElementById('marker').innerText = "";
+      document.getElementById('crayon').innerText = "";
+      document.getElementById('paint').innerText = "";
       document.getElementById('small').innerText = "";
       document.getElementById('medium').innerText = "";
       document.getElementById('large').innerText = "";
     }
 
     function leftHandSetting(){
-    
-
+      
       $(".group1Right").children().eq(0).addClass("colorDegree270Right");
       $(".group1Right").children().eq(1).addClass("colorDegree300Right");
       $(".group1Right").children().eq(2).addClass("colorDegree330Right");
@@ -671,19 +865,19 @@ $(document).ready(function() {
       $("div.menuHolder > div").css("transition", "width 0.00s");     
       $("div.menuHolder > div").css("visibility", "hidden");
 
-      var temp1 = 1365 - 100 + "px";
-      var temp2 = 1365 - 200 + "px";
+      var temp1 = window.innerWidth - 100 + "px";
+      var temp2 = window.innerWidth - 200 + "px";
       $( '#brushType' ).css("left",temp1);
       $( '#brushThickness' ).css("left",temp1);
       $( '#brushTypeHover' ).css("left",temp1);
       $( '#brushThicknessHover' ).css("left",temp1);
-      $( '#crayon1' ).css("left",temp2);
-      $( '#crayon2' ).css("left",temp2);
-      $( '#crayon3' ).css("left",temp2);
+      $( '#marker' ).css("left",temp2);
+      $( '#crayon' ).css("left",temp2);
+      $( '#paint' ).css("left",temp2);
       $( '#small' ).css("left",temp2);
       $( '#medium' ).css("left",temp2);
       $( '#large' ).css("left",temp2);
-      
+      $("#menuHolderRight").css("left",temp1);
     }
     
     function rightHandSetting(){
@@ -696,9 +890,9 @@ $(document).ready(function() {
       $( '#brushThickness' ).css("left","0px");
       $( '#brushTypeHover' ).css("left","0px");
       $( '#brushThicknessHover' ).css("left","0px");
-      $( '#crayon1' ).css("left","100px");
-      $( '#crayon2' ).css("left","100px");
-      $( '#crayon3' ).css("left","100px");
+      $( '#marker' ).css("left","100px");
+      $( '#crayon' ).css("left","100px");
+      $( '#paint' ).css("left","100px");
       $( '#small' ).css("left","100px");
       $( '#medium' ).css("left","100px");
       $( '#large' ).css("left","100px");
@@ -764,11 +958,11 @@ $(document).ready(function() {
             break;
             
             case "screenTap":
-              console.log("screenTap");
+           //   console.log("screenTap");
             break;
             
             case "keyTap":
-              console.log("keyTap");
+          //    console.log("keyTap");
               if(drawStarted==false)
                 clearDrawingCanvas();
             break;
@@ -784,7 +978,113 @@ $(document).ready(function() {
       }
     }
     
+  function brushTypeColor(){
+    if(globalBrushType=="crayon"){
+      
+      var tempGlobalColor = globalColor+"";
+      //var pat = null;
+      switch (tempGlobalColor) {
+  
+          case "rgb(165, 42, 42)":   pat=ctx.createPattern(crayonBrown,"repeat");  break;
+          case "rgb(128, 0, 128)":   pat=ctx.createPattern(crayonPurple,"repeat");  break;
+          case "rgb(255, 192, 203)":   pat=ctx.createPattern(crayonPink,"repeat");  break;
+          
+          case "rgb(255, 0, 255)":   pat=ctx.createPattern(crayonMagenta,"repeat");  break;
+          case "rgb(128, 0, 0)":   pat=ctx.createPattern(crayonMaroon,"repeat");  break;
+          case "rgb(255, 215, 0)":   pat=ctx.createPattern(crayonGold,"repeat");  break;
+  
+          case "rgb(0, 128, 0)":   pat=ctx.createPattern(crayonGreen,"repeat");  break;
+          case "rgb(128, 128, 128)":   pat=ctx.createPattern(crayonGray,"repeat");  break;
+          case "rgb(255, 255, 255)":   pat=ctx.createPattern(crayonWhite,"repeat");  break;
+  
+          case "rgb(255, 255, 0)":   pat=ctx.createPattern(crayonYellow,"repeat");  break;
+          case "rgb(255, 0, 0)":   pat=ctx.createPattern(crayonRed,"repeat");  break;
+          case "rgb(0, 0, 255)":   pat=ctx.createPattern(crayonBlue,"repeat");  break;
+          case "gray":             pat=ctx.createPattern(crayonGray,"repeat");   break;
+          
+          default:
+        }  
+      
+      
+    }else if(globalBrushType=="paint"){
+    
+      var tempGlobalColor = globalColor+"";
+      //var pat = null;
+      //prevGlobalColor = globalColor;
+      switch (tempGlobalColor) {
+  
+          case "rgb(165, 42, 42)":   pat=ctx.createPattern(paintBrown,"repeat");   break;
+          case "rgb(128, 0, 128)":   pat=ctx.createPattern(paintPurple,"repeat");  break;
+          case "rgb(255, 192, 203)":   pat=ctx.createPattern(paintPink,"repeat");  break;
+          
+          case "rgb(255, 0, 255)":   pat=ctx.createPattern(paintMagenta,"repeat");  break;
+          case "rgb(128, 0, 0)":   pat=ctx.createPattern(paintMaroon,"repeat");     break;
+          case "rgb(255, 215, 0)":   pat=ctx.createPattern(paintGold,"repeat");     break;
+  
+          case "rgb(0, 128, 0)":   pat=ctx.createPattern(paintGreen,"repeat");     break;
+          case "rgb(128, 128, 128)":   pat=ctx.createPattern(paintGray,"repeat");  break;
+          case "rgb(255, 255, 255)":   pat=ctx.createPattern(paintWhite,"repeat"); break;
+  
+          case "rgb(255, 255, 0)":   pat=ctx.createPattern(paintYellow,"repeat");  break;
+          case "rgb(255, 0, 0)":   pat=ctx.createPattern(paintRed,"repeat");       break;
+          case "rgb(0, 0, 255)":   pat=ctx.createPattern(paintBlue,"repeat");      break;
+          
+          default:
 
+        }         
+  
+      
+    }
+  } 
+
+  function unTriggerColorPalletteAnimation0(){
+    if(curColorGroup==1){   
+      $(".group1 div:eq(0)").animate(
+        {opacity:'1.0',height:'200px',width:'200px',borderBottomRightRadius:'200px'},1000,function(){ unTriggerColorPallette() });
+    }else if(curColorGroup==4){
+      $(".group4 div:eq(0)").animate(
+        {opacity:'1.0',height:'200px',width:'200px',borderBottomRightRadius:'200px'},1000,function(){ unTriggerColorPallette() });
+    }else if(curColorGroup==3){
+      $(".group3 div:eq(0)").animate(
+        {opacity:'1.0',height:'200px',width:'200px',borderBottomRightRadius:'200px'},1000,function(){ unTriggerColorPallette() });
+    }else if(curColorGroup==2){
+      $(".group2 div:eq(0)").animate(
+        {opacity:'1.0',height:'200px',width:'200px',borderBottomRightRadius:'200px'},1000,function(){ unTriggerColorPallette() });
+    }
+  }
+  
+  function unTriggerColorPalletteAnimation1(){
+    if(curColorGroup==1){   
+      $(".group1 div:eq(1)").animate(
+        {opacity:'1.0',height:'200px',width:'200px'},1000,function(){ unTriggerColorPallette() });
+    }else if(curColorGroup==4){
+      $(".group4 div:eq(1)").animate(
+        {opacity:'1.0',height:'200px',width:'200px'},1000,function(){ unTriggerColorPallette() });
+    }else if(curColorGroup==3){
+      $(".group3 div:eq(1)").animate(
+        {opacity:'1.0',height:'200px',width:'200px'},1000,function(){ unTriggerColorPallette() });
+    }else if(curColorGroup==2){
+      $(".group2 div:eq(1)").animate(
+        {opacity:'1.0',height:'200px',width:'200px'},1000,function(){ unTriggerColorPallette() });
+    }
+  }
+
+  function unTriggerColorPalletteAnimation2(){
+    if(curColorGroup==1){   
+      $(".group1 div:eq(2)").animate(
+        {opacity:'1.0',height:'200px',width:'200px'},1000,function(){ unTriggerColorPallette() });
+    }else if(curColorGroup==4){
+      $(".group4 div:eq(2)").animate(
+        {opacity:'1.0',height:'200px',width:'200px'},1000,function(){ unTriggerColorPallette() });
+    }else if(curColorGroup==3){
+      $(".group3 div:eq(2)").animate(
+        {opacity:'1.0',height:'200px',width:'200px'},1000,function(){ unTriggerColorPallette() });
+    }else if(curColorGroup==2){
+      $(".group2 div:eq(2)").animate(
+        {opacity:'1.0',height:'200px',width:'200px'},1000,function(){ unTriggerColorPallette() });
+    }
+  } 
+  
     function rotateColorPalette(gesture,frame){
       circle = frame.gestures[0];
       // Get Pointable object
