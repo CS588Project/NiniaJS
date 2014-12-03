@@ -15,7 +15,7 @@ $(document).ready(function(){
 });
 
 function galleryControl(frame){
-    if (frame.length > 1 && imgToFullScreen == true) {//full Image with two hands, trigger scale
+    if (frame.hands.length > 1 && imgToFullScreen == true) {
 	  	console.warn("TWO HANDS!!");
     	var hand_0 = frame.hands[0];
     	var hand_1 = frame.hands[1];
@@ -73,7 +73,6 @@ function galleryControl(frame){
 	    //for debug output
     	coords4 = "x0: "+canvasWholeX_0 + "  y0: "+canvasWholeY_0 + "  x1: "+canvasWholeX_1 + "  y1: "+canvasWholeY_1;
     	coords4 += "  initDistance: " + initDistance + "  distance: " + distance + "  scaleRate: " + scaleRate;    }
-	  
 	  if(frame.hands.length == 1 && frame.pointables.length > 0){
   		firstTwoHandsFlag = true;
 	  	twoHandsFlag = false;
