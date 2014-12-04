@@ -2,6 +2,7 @@
 var triggerFlag;
 var menuClickFlag;
 var firstClickFlag;//firstClickFlag!///
+var tutorialState;
 
 $(document).ready(function(){
   triggerFlag = false;
@@ -41,7 +42,17 @@ $(document).ready(function(){
         firstClickFlag = false;
       }
       ////////////////////
-      if(hand.confidence> 0.5 && hand.grabStrength >= 0.9 && triggerFlag == false && firstClickFlag == false){
+       if(hand.confidence> 0.5 && hand.grabStrength >= 0.9 && triggerFlag == false && firstClickFlag == false &&
+        tutorialState!="start" &&  
+        tutorialState!="poke" &&
+        tutorialState!="draw" &&
+        tutorialState!="erase" &&
+        tutorialState!="colorPalette" &&
+        tutorialState!="wave" &&
+        tutorialState!="flipup" &&
+        tutorialState!="scale" &&
+        tutorialState!="move" 
+      ){
         $('.trigger').trigger("dblclick");
         //triggerFlag = true;
       }
@@ -82,7 +93,7 @@ $(document).ready(function(){
         canvasControl(frame);
       }
       else if(document.title == "Ninia - Slides"){
-        ;
+        pdfControl(frame);
       }
     }
 

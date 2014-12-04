@@ -4,23 +4,26 @@ $(document).ready( function(){
   var fcheck = first_check[0];
   if (document.title == "Ninia - Video"){
     fcheck = first_check[2];
-    t_set = ['t_video_wave','t_video_flipup','t_video_wave2','t_video_circle', 't_video_stop', 't_video_flipup'];
+    //t_set = ['t_video_wave','t_video_flipup','t_video_wave2','t_video_circle', 't_video_stop', 't_video_flipup'];
+    t_set = [];
   }
   else if(document.title == "Ninia - Gallery"){
     fcheck = first_check[0];
-    t_set = ['t_gallery_wave','t_gallery_flipup','t_gallery_scale','t_gallery_move', 't_gallery_flipup'];
+    t_set = ['t_gallery_wave','t_gallery_flipup','t_gallery_scale','t_gallery_move'];
   }
   else if(document.title == "Ninia - Canvas"){
     fcheck = first_check[3];
-    t_set = ['t_canvas_pokein','t_canvas_movefinger','t_canvas_movestop','t_canvas_movetocorner', 't_canvas_movetoside', 't_canvas_movetotop'];
+    t_set = ['t_canvas_pokein','t_canvas_movefinger','t_canvas_movestop','t_canvas_movetocorner', 't_canvas_movetoside'];
   }
   else if(document.title == "Ninia - Slides"){
     fcheck = first_check[1];
-    t_set = ['t_slides_wave','t_slides_flipup', 't_slides_circle', 't_slides_flipup'];
+    //t_set = ['t_slides_wave','t_slides_flipup', 't_slides_circle', 't_slides_flipup'];
+    t_set = [];
   }
-
+  tutorialState = "start";
   if(checkCookie(fcheck)){
     document.getElementById('tutorial_img').style.visibility='hidden';
+    tutorialState = "end";
     return 0;
   }
   else setCookie(fcheck, true, 1); 

@@ -6,23 +6,30 @@
   <script src="js/jquery.min.js"></script>
   <script src="js/jquery.easing.1.3.js"></script>
   <script src="js/jquery.popcircle.1.0.js"></script>
-  <script src="//js.leapmotion.com/leap-0.6.4.min.js"></script>
+  <script src="js/leap-0.6.2.min.js"></script>
   <script src="js/leap-plugins-0.1.6.1.min.js"></script>
   <script src="js/leap.rigged-hand-0.1.4.min.js"></script>
   <link rel="stylesheet" type="text/css" href="css/controlpad.css">
   <script src="js/controlpad.js"></script>
 
   <script src="js/canvas.js"></script>
+  
   <script src="js/tutorial.js"></script>
+  
   <link rel="stylesheet" type="text/css" href="css/canvas.css">
   <link rel="stylesheet" type="text/css" href="css/ColorPalette.css" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
 <body bgcolor="black" style="height:100%; width:100% overflow:hidden">
+
+  
   <!-- canvas -->
   <div class="blur">
+  
   <canvas id="myCanvas" style="height:100%; width:100%; z-index:0 "></canvas> 
 
+
+    
   <div class="menuHolder" style="position:absolute;"> 
     <div id="colorPalette" style="z-index:10">Color Palette         
     </div> 
@@ -49,8 +56,9 @@
         <div style="z-index:3"  onmousemove="mouseMove(event)">Red</div>
         <div style="z-index:3"  onmousemove="mouseMove(event)">Blue</div>
     </div>
-
-    <div class="menuHolderRight"> 
+  
+  <!---------------------------------------Right Hand Color Palette ------------------------------------->
+  <div class="menuHolderRight"> 
     <div id="colorPaletteRight" style="z-index:10">Color Palette          
     </div> 
       
@@ -59,10 +67,17 @@
       <div onmousemove="mouseMove(event)">Purple</div>
       <div onmousemove="mouseMove(event)">Pink</div>
     </div>
-    </div> 
   </div> 
+  <!---------------------------------------Right Hand Color Palette ------------------------------------->
+    
+  </div> 
+  
 
   <div class="collision" id="leapCursor" style="z-index:15;opacity:1.0;position:absolute;"></div>
+  
+
+  
+  
   <div id="brushTypeHover" style="position:absolute;padding:0px;left:0px;width:100px;height:150px; opacity:0.5;background-color:gray;z-index:9;font-weight:bold;color:white" >
     Brush Type
   </div>    
@@ -78,7 +93,7 @@
     <div id="innerBrushThickness" style="width:100px; height:100px;margin-top:20px;background-image:url(img/small.png);background-size:100% 100%;background-repeat:no-repeat;background-position:center">
     </div>
   </div>
-
+  
   <div id="marker" class="brushTypeL2" style="position:absolute;left:100px;height:100px; opacity:1.0; background-color:gray;z-index:10;" ></div>
   <div id="crayon" class="brushTypeL2" style="position:absolute;left:100px;height:100px; opacity:1.0; background-color:gray;z-index:10" ></div>
   <div id="paint" class="brushTypeL2" style="position:absolute;left:100px;height:100px; opacity:1.0; background-color:gray;z-index:10" ></div>
@@ -86,6 +101,44 @@
   <div id="small" class="brushThicknessL2" style="position:absolute;left:100px;height:100px; opacity:1.0; background-color:gray;z-index:10;"  ></div>
   <div id="medium" class="brushThicknessL2" style="position:absolute;left:100px;height:100px; opacity:1.0; background-color:gray;z-index:10;" ></div>
   <div id="large" class="brushThicknessL2" style="position:absolute;left:100px;height:100px; opacity:1.0; background-color:gray;z-index:10;" ></div>
+
+  <!------------------------------------- Crayon Brush Img --------------------------------------->
+  <img src="img/pen/pen_crayon_brown.png" id="crayonBrown" style = " visiblity: hidden; z-index: -1;"/>
+  <img src="img/pen/pen_crayon_purple.png" id="crayonPurple" style = " visiblity: hidden; z-index: -1;"/>
+  <img src="img/pen/pen_crayon_pink.png" id="crayonPink" style = " visiblity: hidden; z-index: -1;"/> 
+ 
+  <img src="img/pen/pen_crayon_magenta.png" id="crayonMagenta" style = " visiblity: hidden; z-index: -1;"/> 
+  <img src="img/pen/pen_crayon_darkred.png" id="crayonMaroon" style = " visiblity: hidden; z-index: -1;"/>
+  <img src="img/pen/pen_crayon_gold.png" id="crayonGold" style = " visiblity: hidden; z-index: -1;"/>
+  
+  <img src="img/pen/pen_crayon_grean.png" id="crayonGreen" style = " visiblity: hidden; z-index: -1;"/>
+  <img src="img/pen/pen_crayon_gray.png" id="crayonGray" style = " visiblity: hidden; z-index: -1;"/>
+  <img src="img/pen/pen_crayon_white.png" id="crayonWhite" style = " visiblity: hidden; z-index: -1;"/>
+  
+  <img src="img/pen/pen_crayon_yellow.png" id="crayonYellow" style = " visiblity: hidden; z-index: -1;"/>
+  <img src="img/pen/pen_crayon_red.png" id="crayonRed" style = " visiblity: hidden; z-index: -1;"/>
+  <img src="img/pen/pen_crayon_blue.png" id="crayonBlue" style = " visiblity: hidden; z-index: -1; "/>
+  <!------------------------------------- Crayon Brush Img --------------------------------------->
+   
+  <!------------------------------------- Paint Brush Img --------------------------------------->
+  <img src="img/pen/pen_paint_brown.png" id="paintBrown" style = " visiblity: hidden; z-index: -1;"/>
+  <img src="img/pen/pen_paint_purple.png" id="paintPurple" style = " visiblity: hidden; z-index: -1;"/>
+  <img src="img/pen/pen_paint_pink.png" id="paintPink" style = " visiblity: hidden; z-index: -1;"/> 
+ 
+  <img src="img/pen/pen_paint_magenta.png" id="paintMagenta" style = " visiblity: hidden; z-index: -1;"/> 
+  <img src="img/pen/pen_paint_darkred.png" id="paintMaroon" style = " visiblity: hidden; z-index: -1;"/>
+  <img src="img/pen/pen_paint_gold.png" id="paintGold" style = " visiblity: hidden; z-index: -1;"/>
+  
+  <img src="img/pen/pen_paint_green.png" id="paintGreen" style = " visiblity: hidden; z-index: -1;"/>
+  <img src="img/pen/pen_paint_gray.png" id="paintGray" style = " visiblity: hidden; z-index: -1;"/>
+  <img src="img/pen/pen_paint_white.png" id="paintWhite" style = " visiblity: hidden; z-index: -1;"/>
+  
+  <img src="img/pen/pen_paint_yellow.png" id="paintYellow" style = " visiblity: hidden; z-index: -1;"/>
+  <img src="img/pen/pen_paint_red.png" id="paintRed" style = " visiblity: hidden; z-index: -1;"/>
+  <img src="img/pen/pen_paint_blue.png" id="paintBlue" style = " visiblity: hidden; z-index: -1; "/>
+  <!------------------------------------- Paint Brush Img --------------------------------------->
+   
+ 
   <div id="brushChoice" style="position:absolute;left:200px;height:100px;background-color:rgb(167,71,8);z-index:10" ></div>
   <div id="brushClip" style="position:absolute;left:100px;height:100px;z-index:11" ></div>
   </div>
@@ -127,6 +180,8 @@
       </ul>
     </div>
   </div>
+  
+
   <img id="tutorial_img" style=" opacity:0; position: absolute; top:0; left: 0; height:100%; width:100%; z-index:0;" onclick="nextTutorial()" />
   <img id='help1' src="img/gesture/h_canvas_pokein.png"/>
   <img id='help2' src="img/gesture/h_canvas_movefinger.png"/>
@@ -134,5 +189,7 @@
   <img id='help4' src="img/gesture/h_canvas_movetocorner.png"/>
   <img id='help5' src="img/gesture/h_canvas_movetoside.png"/>
   <img id='help6' src="img/gesture/h_canvas_movetotop.png"/>
+
+  
 </body>
 </html>

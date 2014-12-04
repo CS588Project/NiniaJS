@@ -18,6 +18,12 @@ function moveToPre(){
     myNewFlow.moveTo(pre['index']);
 }
 
+function moveToIndex(deltaIndex) {
+    console.warn(deltaIndex);
+    var object = myNewFlow.getActiveItem();
+    myNewFlow.moveTo((object['index'] + deltaIndex)%pdf_num);
+}
+
 function moveToNxt(){
     var object = myNewFlow.getActiveItem();
     var nxt = object['next'];
@@ -32,8 +38,6 @@ function getFile(){
 
 function popPDF(filename){
   var url = './js/pdfjs/web/viewer.html?filename='+filename;
-    var x = document.getElementById("demo");
-    x.innerHTML = "<font color='red'>"+url+"</font>";
   $.colorbox({iframe:true, href:url, width:"70%", height:"100%", onComplete:function(){
     document.getElementById("cboxLoadedContent").getElementsByTagName("iframe")[0].focus();
   }});
@@ -76,12 +80,10 @@ $(document).ready( function() {
     //var myNewFlow = new ContentFlow('cf', {endOpacity:0.5, visibleItems:4, relativeItemPosition:'center top', maxItemHeight:h*0.8, flowSpeedFactor:0.5}) ;
     //can use flowSpeedFactor to change the speed
     pdflist = ["01.pdf", "02.pdf", "03.pdf", "04.pdf", "05.pdf", "06.pdf", "07.pdf", "08.pdf", "09.pdf"];
-
+    pdf_num = pdflist.length;
     for (var i = 0; i < pdflist.length; i++) {
         getPDFThumbnail(i, pdflist[i]);
     };
-    var x = document.getElementById("demo");
-    x.innerHTML = "<font color='red'>"+myNewFlow.getActiveItem()+"</font>";
     //TODO: Dynamicaly add Image
     /**
     var x = document.getElementById("demo");

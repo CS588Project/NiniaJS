@@ -24,16 +24,6 @@ var globalHand = "right"; //default;
 var gestureFrameCount = 0;
 var pat = null;
 
-
-/************* For Real Time Output ***********************/
-/*
-var distanceDisplay;
-var cursorXY;
-var handType;
-*/
-/**************** For Real Time Output*********************/
-    
-
 $(document).ready(function() {  
   $(document.body).css({
     "overflow-x":"hidden",
@@ -58,7 +48,7 @@ $(document).ready(function() {
   initialDrawingCanvas();
   //Initialize the color palette
   initialColorPalette();
-
+  tutorialState = "start";
   });
   
   
@@ -82,26 +72,141 @@ $(document).ready(function() {
   }
   
   // Setup Leap loop with frame callback function
-  function canvasControl (frame) {
-    if(frame.pointables.length > 0){
-      getLeapPosition(leapValid,frame);           
-      overlappingDetection();
-      drawingANDerasing(frame);
-      if(colorPaletteStarted==true){
-        if( Math.sqrt(cursorX*cursorX+cursorY*cursorY)>100 )
+  var controllerOptions = {enableGestures: true};
+
+  function canvasControl(frame){
+  
+    if(tutorialState=="end"){
+      if(frame.pointables.length > 0){
+          getLeapPosition(leapValid,frame);           
+          overlappingDetection();
+          drawingANDerasing(frame);
+        if(colorPaletteStarted==true){
+          if( Math.sqrt(cursorX*cursorX+cursorY*cursorY)>100 )
           mouseMove(null,cursorX,cursorY);
+        }
+        
+        gestureDetection(frame);
+      
+      }else{
+        leapValid=false;
+        cursorLeapMotion.style.visibility="hidden";
+        resetBrushMenu();
+        resetColorPallette();
+      } 
+    }else{
+      tutorialAnimation(frame);
+    }
+    
+  }
+
+  function tutorialAnimation(frame){
+  
+    if(tutorialState=="start"){
+      console.log(tutorialState);
+      if(tutorial_idx==1){
+        if(frame.pointables.length > 0){
+          var touchDistance = frame.pointables[1].touchDistance;
+          if(touchDistance<0){
+          
+            setTimeout(function(){nextTutorial();}, 1000);
+            tutorialState = "poke";
+          }     
+        }
+      }
+    }else if(tutorialState=="poke"){
+      console.log(tutorialState);
+      if(tutorial_idx==2){
+        if (frame.hands.length > 0){
+          frame.hands.forEach(function(hand){
+            var touchDistance = frame.pointables[1].touchDistance;
+            if(touchDistance<0){
+              if( hand.pinchStrength>0 ){
+                setTimeout(function(){nextTutorial();}, 1000);
+                tutorialState = "draw";
+              }
+            }
+          });
+        }
+      }
+    }else if(tutorialState=="draw"){
+      console.log(tutorialState);
+      if(tutorial_idx==3){
+        if (frame.hands.length > 0){
+          frame.hands.forEach(function(hand){
+            var touchDistance = frame.pointables[1].touchDistance;
+            if(touchDistance<0){
+              if( hand.pinchStrength==0 ){
+                setTimeout(function(){nextTutorial();}, 1000);
+                tutorialState = "erase";
+              }
+            }
+          });
+        }
+      }
+    }else if(tutorialState=="erase"){
+      console.log(tutorialState);
+      if(tutorial_idx==4){
+        if(frame.pointables.length > 0){
+          getLeapPosition(leapValid,frame);           
+          
+          var leapCursor = $( '#leapCursor' )[0];
+          var colorPalette = document.getElementById("colorPalette");
+          
+          if(overlaps( leapCursor, colorPalette )==true){
+            setTimeout(function(){nextTutorial();}, 1000);
+            tutorialState = "colorPalette";
+          }
+      
+          drawingANDerasing(frame);
+          if(colorPaletteStarted==true){
+            if( Math.sqrt(cursorX*cursorX+cursorY*cursorY)>100 )
+            mouseMove(null,cursorX,cursorY);
+          }   
+        }else{
+          leapValid=false;
+          cursorLeapMotion.style.visibility="hidden";
+          resetBrushMenu();
+          resetColorPallette();
+        } 
+        
       }
       
-      gestureDetection(frame);
+    }else if(tutorialState=="colorPalette"){
     
-    }else{
-      leapValid=false;
-      cursorLeapMotion.style.visibility="hidden";
-      resetBrushMenu();
-      resetColorPallette();
+      console.log(tutorialState);
+      if(tutorial_idx==5){
+        if(frame.pointables.length > 0){
+          getLeapPosition(leapValid,frame);           
+          
+          var leapCursor = $( '#leapCursor' )[0];
+          var brushTypeButton = $( '#brushType' )[0]
+          
+          if(overlaps( leapCursor, brushTypeButton )==true){
+            setTimeout(function(){nextTutorial();}, 1000);
+            tutorialState = "end";
+          }
+      
+          drawingANDerasing(frame);
+          if(colorPaletteStarted==true){
+            if( Math.sqrt(cursorX*cursorX+cursorY*cursorY)>100 )
+            mouseMove(null,cursorX,cursorY);
+          }   
+        }else{
+          leapValid=false;
+          cursorLeapMotion.style.visibility="hidden";
+          resetBrushMenu();
+          resetColorPallette();
+        } 
+        
+      }
+      
     }
-  }
   
+    
+  }
+
+ 
     var overlaps = (function () {
       function getPositions( elem ) {
         var pos, width, height;
@@ -248,51 +353,57 @@ $(document).ready(function() {
           }else{
             if(overlaps(leapCursor,crayon1Button)==true){
       
-              brushChoiceButton.css({"width":"25px","top":crayon1Button.style.top+""});
+              brushChoiceButton.css({"width":"25px","top":crayon1Button.style.top+"","opacity":"0.5"});
                 document.getElementById("brushClip").style.width =  cursorX-100+"px"
                 document.getElementById("brushClip").style.top = crayon1Button.style.top+"";
                 document.getElementById("brushClip").style.backgroundColor = "rgb(167,71,8)";
+        document.getElementById("brushClip").style.opacity = 0.5;
               prevState2 = "marker";
               prevState = "brushTypeL2";
         
     
             }else if(overlaps(leapCursor,crayon2Button)==true){
               
-              brushChoiceButton.css({"width":"25px","top":crayon2Button.style.top+""});
+              brushChoiceButton.css({"width":"25px","top":crayon2Button.style.top+"","opacity":"0.5"});
                 document.getElementById("brushClip").style.width =  cursorX-100+"px"
                 document.getElementById("brushClip").style.top = crayon2Button.style.top+"";
                 document.getElementById("brushClip").style.backgroundColor = "rgb(167,71,8)";
+        document.getElementById("brushClip").style.opacity = 0.5;
               prevState2 = "crayon";
               prevState = "brushTypeL2";
             }else if(overlaps(leapCursor,crayon3Button)==true){
-              brushChoiceButton.css({"width":"25px","top":crayon3Button.style.top+""});
+              brushChoiceButton.css({"width":"25px","top":crayon3Button.style.top+"","opacity":"0.5"});
                 document.getElementById("brushClip").style.width =  cursorX-100+"px"
                 document.getElementById("brushClip").style.top = crayon3Button.style.top+"";
                 document.getElementById("brushClip").style.backgroundColor = "rgb(167,71,8)";
+        document.getElementById("brushClip").style.opacity = 0.5;
               prevState2 = "paint";
               prevState = "brushTypeL2";
             }else if(overlaps(leapCursor,smallButton)==true){
       
-              brushChoiceButton.css({"width":"25px","top":smallButton.style.top+""});
+              brushChoiceButton.css({"width":"25px","top":smallButton.style.top+"","opacity":"0.5"});
                 document.getElementById("brushClip").style.width =  cursorX-100+"px"
                 document.getElementById("brushClip").style.top = smallButton.style.top+"";
                 document.getElementById("brushClip").style.backgroundColor = "rgb(167,71,8)";
+        document.getElementById("brushClip").style.opacity = 0.5;
               prevState2 = "small";
               prevState = "brushThicknessL2";
             }else if(overlaps(leapCursor,mediumButton)==true){
-              brushChoiceButton.css({"width":"25px","top":mediumButton.style.top+""});
+              brushChoiceButton.css({"width":"25px","top":mediumButton.style.top+"","opacity":"0.5"});
               
                 document.getElementById("brushClip").style.width =  cursorX-100+"px"
                 document.getElementById("brushClip").style.top = mediumButton.style.top+"";
                 document.getElementById("brushClip").style.backgroundColor = "rgb(167,71,8)";
+        document.getElementById("brushClip").style.opacity = 0.5;
               prevState2 = "medium";
               prevState = "brushThicknessL2";
             }else if(overlaps(leapCursor,largeButton)==true){
-              brushChoiceButton.css({"width":"25px","top":largeButton.style.top+""});
+              brushChoiceButton.css({"width":"25px","top":largeButton.style.top+"","opacity":"0.5"});
               
                 document.getElementById("brushClip").style.width =  cursorX-100+"px"
                 document.getElementById("brushClip").style.top = largeButton.style.top+"";
                 document.getElementById("brushClip").style.backgroundColor = "rgb(167,71,8)";
+        document.getElementById("brushClip").style.opacity = 0.5;
               prevState2 = "large";
               prevState = "brushThicknessL2";
             }else{    
@@ -634,6 +745,8 @@ $(document).ready(function() {
     }
     
     function decreaseColorGroup(){
+      
+      
               stepAngle = -90;
             //if(iniColorGroup1>-180){
               if(curColorGroup==1){
@@ -854,7 +967,10 @@ $(document).ready(function() {
     }
 
     function leftHandSetting(){
-      
+    
+
+    $(".menuHolderRight").css("left",$(window).get(0).innerWidth - 100 + "px");
+    
       $(".group1Right").children().eq(0).addClass("colorDegree270Right");
       $(".group1Right").children().eq(1).addClass("colorDegree300Right");
       $(".group1Right").children().eq(2).addClass("colorDegree330Right");
@@ -865,8 +981,8 @@ $(document).ready(function() {
       $("div.menuHolder > div").css("transition", "width 0.00s");     
       $("div.menuHolder > div").css("visibility", "hidden");
 
-      var temp1 = window.innerWidth - 100 + "px";
-      var temp2 = window.innerWidth - 200 + "px";
+      var temp1 = $(window).get(0).innerWidth - 100 + "px";
+      var temp2 = $(window).get(0).innerWidth - 200 + "px";
       $( '#brushType' ).css("left",temp1);
       $( '#brushThickness' ).css("left",temp1);
       $( '#brushTypeHover' ).css("left",temp1);
@@ -877,7 +993,7 @@ $(document).ready(function() {
       $( '#small' ).css("left",temp2);
       $( '#medium' ).css("left",temp2);
       $( '#large' ).css("left",temp2);
-      $("#menuHolderRight").css("left",temp1);
+      
     }
     
     function rightHandSetting(){

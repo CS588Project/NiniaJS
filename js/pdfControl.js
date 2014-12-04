@@ -7,11 +7,11 @@ var initDistance;
 
 $(document).ready(function(){
   gSpeedMax = 0;
-  openvideo = false;
+  openpdf = false;
   handOut();
 });
 
-function videoControl(frame){
+function pdfControl(frame){
   if (frame.hands.length > 1) {
         console.warn("TWO HANDS!!");
         var hand_0 = frame.hands[0];
@@ -50,7 +50,8 @@ function videoControl(frame){
         distance = distance.toFixed(1);
 
       if(distance < 200){
-        if(openvideo) openVideo();
+            $.colorbox.close();
+        
         return;
       }
   }  
@@ -64,14 +65,14 @@ function videoControl(frame){
     canvasWholeX = window.innerWidth * normalizedPosition[0];
     canvasWholeY = window.innerHeight * (1 - normalizedPosition[1]);
 
-    if(canvasWholeY < 50 && openvideo == false){
-    	openVideo();
+    if(canvasWholeY < 50 && openpdf == false){
+      getFile();
     }
-    if(canvasWholeY > window.innerHeight - 50 && openvideo == true){
-    	//openVideo();
+    if(canvasWholeY > window.innerHeight - 50 && openpdf == true){
+      ;
     }
 
-   	handControl(null, canvasWholeX, canvasWholeY);
+    handControl(null, canvasWholeX, canvasWholeY);
   }
 }
 
@@ -79,13 +80,12 @@ var preScrollX,preScrollY;
 var posX = 0, posY = 0;
 var xBoundry, yBoundry;
 var scrPos;
-var video_num;
 
 $(document).mousemove(function(event){handControl(event);}); 
 
 //control function; event means mouse, no-event means Leap;
 function handControl(e, leapX, leapY){
-	var grid = window.screen.width/video_num;
+  var grid = window.screen.width/pdf_num;
     if(e != null){
         //console.log("X_not_leap:" + e.pageX); 
     }
@@ -104,14 +104,14 @@ function handControl(e, leapX, leapY){
     if(leftOrRight == 0) {
         if((e!=null ? e.pageX : leapX) >= (scrPos + grid)) {
             leftOrRight = 2; // right
-            if(!openvideo) moveToIndex(flowSpeed);
+            if(!openpdf) moveToIndex(flowSpeed);
             scrPos = (e!=null ? e.pageX : leapX);
             return;
         }
         if((e!=null ? e.pageX : leapX) <= (scrPos - grid)) {
             leftOrRight = 1; // left
             scrPos = (e!=null ? e.pageX : leapX);
-            if(!openvideo) moveToIndex(-flowSpeed);
+            if(!openpdf) moveToIndex(-flowSpeed);
             return;
         }
         return;
@@ -123,7 +123,7 @@ function handControl(e, leapX, leapY){
         }
         if((e!=null ? e.pageX : leapX) <= (scrPos - grid)) {
             scrPos = (e!=null ? e.pageX : leapX);
-            if(!openvideo) moveToIndex(-flowSpeed);
+            if(!openpdf) moveToIndex(-flowSpeed);
             return;
         }
         return;
@@ -135,7 +135,7 @@ function handControl(e, leapX, leapY){
         }
         if((e!=null ? e.pageX : leapX) >= (scrPos + grid)) {
             scrPos = (e!=null ? e.pageX : leapX);
-            if(!openvideo) moveToIndex(flowSpeed);
+            if(!openpdf) moveToIndex(flowSpeed);
             return;
         }
         return;

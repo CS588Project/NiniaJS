@@ -47,8 +47,10 @@
     var firstTimeIn = true;
     var scrPos;
     var video_pause = false;
+    var real_pause = false;
+
     function youtubeControl(frame){
-      if(frame.hands.length == 1 && frame.pointables.length > 0){    
+      if(frame.hands.length == 1){    
         //Get a pointable and normalize the tip position
         var pointable = frame.pointables[2];
         var interactionBox = frame.interactionBox;
@@ -57,11 +59,35 @@
         canvasWholeX = window.innerWidth * normalizedPosition[0];
         canvasWholeY = window.innerHeight * (1 - normalizedPosition[1]);
 
-        timeshift(null, canvasWholeX, canvasWholeY);
+        if(frame.pointables.length > 0 && !real_pause) timeshift(null, canvasWholeX, canvasWholeY);
         //pause
-        if(canvasWholeY > window.innerHeight - 50){
+        if(canvasWholeY > window.innerHeight - 50  && frame.pointables.length > 3){
           if(!video_pause) pauseVideo();
           else playVideo();
+        }
+      }
+
+      for(var i = 0; i<frame.gestures.length; i++){
+        switch(frame.gestures[i].type){
+          case "circle":
+            circle = frame.gestures[i];
+            circle.pointable = frame.pointable(circle.pointableIds[0]);
+            if(circle.state == 'start'){
+              clockwise = true;
+            } else if(circle.state == 'update'){
+              direction = circle.pointable.direction;
+              if (direction) {
+                normal = circle.normal;
+                clockwise = Leap.vec3.dot(direction, normal) > 0;
+                if (clockwise) {
+                  increaseVolume();
+                } else{
+                  decreaseVolume();
+                };
+              };
+              
+            }
+          break;
         }
       }
     }
@@ -73,12 +99,12 @@
             firstTimeIn = false;
             return;
         }
-        if((e!=null ? e.pageX : leapX) >= (scrPos + 10)) {
+        if((e!=null ? e.pageX : leapX) >= (scrPos + 30)) {
             jumpByTime(2);
             scrPos = (e!=null ? e.pageX : leapX);
             return;
         }
-        if((e!=null ? e.pageX : leapX) <= (scrPos - 10)) {
+        if((e!=null ? e.pageX : leapX) <= (scrPos - 30)) {
             scrPos = (e!=null ? e.pageX : leapX);
             jumpByTime(-2);
             return;
@@ -87,11 +113,13 @@
     }
 
     function playVideo(){
-      video_pause = false;
+      real_pause = false;
+      setTimeout(function(){ video_pause = false; }, 3000);
       player.playVideo();
     }
     function pauseVideo() {
-      video_pause = true;
+      real_pause = true;
+      setTimeout(function(){ video_pause = true; }, 3000);
       player.pauseVideo();
     }
 
@@ -100,7 +128,6 @@
     }
 
     function jumpByTime(seconds){
-     
       var time = player.getCurrentTime() + seconds;
       if(time >= 0 && time < player.getDuration()){
         seekTo(time);
