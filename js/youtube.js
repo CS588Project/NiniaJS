@@ -5,8 +5,7 @@ tag.src = "https://www.youtube.com/iframe_api";
 var firstScriptTag = document.getElementsByTagName('script')[0];
 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-// 3. This function creates an <iframe> (and YouTube player)
-//    after the API code downloads.
+// 3. This function creates an <iframe> (and YouTube player) after the API code downloads.
 var player;
 function onYouTubeIframeAPIReady() {
   var id = getParameterByName("id");
@@ -31,50 +30,55 @@ function getParameterByName(name) {
 function onPlayerReady(event) {
   event.target.playVideo();
 }
-
+var leftOrRight = 0; // 0: none 1: left 2: right
+var firstTimeIn = true;
+var scrPos;
+var video_pause = false;
 function youtubeControl(frame){
-  if(openvideo){
-    if(frame.hands.length == 1 && frame.pointables.length > 0){    
-      //Get a pointable and normalize the tip position
-      var pointable = frame.pointables[2];
-      var interactionBox = frame.interactionBox;
-      var normalizedPosition = interactionBox.normalizePoint(pointable.tipPosition, true);
+  if(frame.hands.length == 1 && frame.pointables.length > 0){    
+    //Get a pointable and normalize the tip position
+    var pointable = frame.pointables[2];
+    var interactionBox = frame.interactionBox;
+    var normalizedPosition = interactionBox.normalizePoint(pointable.tipPosition, true);
 
-      canvasWholeX = window.innerWidth * normalizedPosition[0];
-      canvasWholeY = window.innerHeight * (1 - normalizedPosition[1]);
+    canvasWholeX = window.innerWidth * normalizedPosition[0];
+    canvasWholeY = window.innerHeight * (1 - normalizedPosition[1]);
 
-      timeshift(null, canvasWholeX, canvasWholeY);
+    timeshift(null, canvasWholeX, canvasWholeY);
+    //pause
+    if(canvasWholeY > window.innerHeight - 50 && imgToFullScreen == true && isScalingFlag == false){
+      if(!video_pause) pauseVideo();
+      else playVideo();
     }
   }
 }
 
 //control function; event means mouse, no-event means Leap;
 function timeshift(e, leapX, leapY){
-    console.warn('yyyyy');
     if(firstTimeIn) {
         scrPos = (e!=null ? e.pageX : leapX);
         firstTimeIn = false;
         return;
     }
-
-    if((e!=null ? e.pageX : leapX) >= (scrPos + 200)) {
-        jumpByTime(5);
+    if((e!=null ? e.pageX : leapX) >= (scrPos + 10)) {
+        jumpByTime(2);
         scrPos = (e!=null ? e.pageX : leapX);
         return;
     }
-    if((e!=null ? e.pageX : leapX) <= (scrPos - 200)) {
+    if((e!=null ? e.pageX : leapX) <= (scrPos - 10)) {
         scrPos = (e!=null ? e.pageX : leapX);
-        jumpByTime(-5);
+        jumpByTime(-2);
         return;
     }
     return;
 }
 
-
 function playVideo(){
+  video_pause = false;
   player.playVideo();
 }
 function pauseVideo() {
+  video_pause = true;
   player.pauseVideo();
 }
 
@@ -83,6 +87,7 @@ function seekTo(time){
 }
 
 function jumpByTime(seconds){
+ 
   var time = player.getCurrentTime() + seconds;
   if(time >= 0 && time < player.getDuration()){
     seekTo(time);
@@ -114,6 +119,13 @@ function closePopUp(){
 }
 
 $(document).ready(function(){
+  var controllerOptions = {enableGestures: true, background: true};
+  Leap.loop(controllerOptions,{
+    frame:function(frame) {
+      youtubeControl(frame);
+    }
+  });
+
   $(document).keydown(function(e){
       if(e.which == 88){
         mute();
@@ -145,5 +157,3 @@ $(document).ready(function(){
       }
   });
 });
-
-

@@ -73,10 +73,7 @@ $(document).ready(function(){
 
       if (document.title == "Ninia - Video"){
         videoControl(frame);
-        if(openvideo) {
-          AjaxPage( "youtube", "js/youtube.js" ); 
-          youtubeControl(frame);
-        }
+        //youtubeControl(frame);
       }
       else if(document.title == "Ninia - Gallery"){
         galleryControl(frame);

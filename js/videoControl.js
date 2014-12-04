@@ -11,7 +11,50 @@ $(document).ready(function(){
   handOut();
 });
 
-function videoControl(frame){	  
+function videoControl(frame){
+  if (frame.hands.length > 1) {
+        console.warn("TWO HANDS!!");
+        var hand_0 = frame.hands[0];
+        var hand_1 = frame.hands[1];
+        
+        var pointable_0;
+        var pointable_1;
+
+        var interactionBox;
+        var normalizedPosition_0;
+        var normalizedPosition_1;
+
+        if(hand_0.pointables.length > 0 && hand_1.pointables.length > 0){
+            pointable_0 = hand_0.pointables[2];
+            pointable_1 = hand_1.pointables[2];
+            interactionBox = frame.interactionBox;
+            normalizedPosition_0 = interactionBox.normalizePoint(pointable_0.tipPosition, true);
+            normalizedPosition_1 = interactionBox.normalizePoint(pointable_1.tipPosition, true);
+        }
+
+        // Convert the normalized coordinates to span the canvas
+        canvasWholeX_0 = window.innerWidth * normalizedPosition_0[0];
+        canvasWholeY_0 = window.innerHeight * (1 - normalizedPosition_0[1]);
+
+        canvasWholeX_1 = window.innerWidth * normalizedPosition_1[0];
+        canvasWholeY_1 = window.innerHeight * (1 - normalizedPosition_1[1]);
+
+        canvasWholeX_0 = canvasWholeX_0.toFixed(1);
+        canvasWholeY_0 = canvasWholeY_0.toFixed(1);
+        canvasWholeX_1 = canvasWholeX_1.toFixed(1);
+        canvasWholeY_1 = canvasWholeY_1.toFixed(1);
+
+        var distanceX = Math.abs(canvasWholeX_0 - canvasWholeX_1);
+        var distanceY = Math.abs(canvasWholeY_0 - canvasWholeY_1);
+        var distance = Math.sqrt(distanceY*distanceY + distanceX*distanceX);
+        distance = distance.toFixed(1);
+
+      if(distance < 200){
+        if(openvideo) openVideo();
+        return;
+      }
+  }  
+
   if(frame.hands.length == 1 && frame.pointables.length > 0){    
     //Get a pointable and normalize the tip position
     var pointable = frame.pointables[2];
@@ -21,11 +64,11 @@ function videoControl(frame){
     canvasWholeX = window.innerWidth * normalizedPosition[0];
     canvasWholeY = window.innerHeight * (1 - normalizedPosition[1]);
 
-    if(canvasWholeY < 10 && openvideo == false){
+    if(canvasWholeY < 50 && openvideo == false){
     	openVideo();
     }
-    if(canvasWholeY > window.innerHeight - 10 && openvideo == true){
-    	openVideo();
+    if(canvasWholeY > window.innerHeight - 50 && openvideo == true){
+    	//openVideo();
     }
 
    	handControl(null, canvasWholeX, canvasWholeY);
