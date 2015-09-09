@@ -100,13 +100,13 @@
             return;
         }
         if((e!=null ? e.pageX : leapX) >= (scrPos + 30)) {
-            jumpByTime(2);
+            jumpByTime(1);
             scrPos = (e!=null ? e.pageX : leapX);
             return;
         }
         if((e!=null ? e.pageX : leapX) <= (scrPos - 30)) {
             scrPos = (e!=null ? e.pageX : leapX);
-            jumpByTime(-2);
+            jumpByTime(-1);
             return;
         }
         return;
